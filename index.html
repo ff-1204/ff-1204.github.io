@@ -3,33 +3,58 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ff-1204</title>
-<meta name="description" content="도리의 정원 — 꽃을 기르고, 꽃잎을 말려, 차로 우리는 작은 정원 게임">
+<title>도리의 정원 초대장</title>
+<meta name="description" content="도리의 정원에 초대합니다 — 꽃을 기르고, 꽃잎을 말려, 차로 우리는 작은 정원 게임">
+<meta property="og:title" content="도리의 정원 초대장">
+<meta property="og:description" content="꽃을 기르고, 꽃잎을 말려, 차로 우려요.">
+<meta property="og:image" content="https://ff-1204.github.io/doris-garden/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #f6f1e7; --panel: #fffaf0; --ink: #3b3128; --muted: #8a7a68; --accent: #5f8a4e; --line: #e2d7c3; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #1f1b17; --panel: #2a241f; --ink: #efe6d6; --muted: #a8998a; --accent: #8fbf74; --line: #3d342c; } }
+  :root { --desk: #d9cbb3; --paper: #fbf5e8; --rule: #e8dcc4; --ink: #4a3a2c; --muted: #8a7560; --seal: #b5473a; --leaf: #5f8a4e; }
+  @media (prefers-color-scheme: dark) { :root { --desk: #1f1b17; --paper: #f4ecdb; } }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
-  main { width: 100%; max-width: 420px; text-align: center; }
-  .card { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; color: inherit; text-decoration: none; }
-  .card img { display: block; width: 100%; height: auto; image-rendering: pixelated; border-bottom: 1px solid var(--line); }
-  .card div { padding: 16px 18px 18px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  p { margin: 0; color: var(--muted); }
-  .go { display: inline-block; margin-top: 14px; padding: 8px 18px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 700; }
-  footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 32px 16px; background: var(--desk); color: var(--ink); font-family: "Gowun Batang", serif; }
+  .letter { position: relative; width: 100%; max-width: 440px; padding: 40px 32px 32px; background: var(--paper);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 31px, var(--rule) 31px 32px);
+    background-position: 0 14px; border-radius: 4px; box-shadow: 0 1px 0 #fff inset, 0 10px 28px rgba(60, 40, 20, .25); transform: rotate(-.6deg); }
+  .letter::before { content: ""; position: absolute; inset: 10px; border: 1px dashed #d8c7a6; border-radius: 2px; pointer-events: none; }
+  .stamp { position: absolute; top: 18px; right: 18px; width: 86px; padding: 4px; background: #fff; transform: rotate(4deg);
+    box-shadow: 0 1px 3px rgba(0,0,0,.2); -webkit-mask: radial-gradient(circle 3px at 3px 3px, transparent 98%, #000) -3px -3px / 8px 8px; mask: radial-gradient(circle 3px at 3px 3px, transparent 98%, #000) -3px -3px / 8px 8px; }
+  .stamp img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated; }
+  .kicker { margin: 0; font-size: 13px; letter-spacing: .3em; color: var(--muted); }
+  h1 { margin: 6px 0 22px; font-size: 26px; font-weight: 700; line-height: 1.3; }
+  p { margin: 0; font-size: 16px; font-weight: 700; line-height: 32px; }
+  .to { margin-bottom: 0; }
+  .sign { margin-top: 20px; text-align: right; color: var(--muted); }
+  .sign b { color: var(--ink); }
+  .go { display: flex; justify-content: center; margin-top: 26px; }
+  .seal { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 999px; background: var(--seal); color: #fff8ee;
+    font: 700 16px/1 "Gowun Batang", serif; text-decoration: none; box-shadow: 0 2px 0 #7d2d24; transition: transform .1s; }
+  .seal:hover { transform: translateY(-1px); }
+  .seal:active { transform: translateY(1px); box-shadow: 0 1px 0 #7d2d24; }
+  .ps { margin-top: 18px; font-size: 13px; font-weight: 400; line-height: 1.7; color: var(--muted); }
+  footer { margin-top: 18px; font-size: 12px; color: #8a7a68; text-align: center; }
+  @media (max-width: 380px) { .letter { padding: 36px 22px 26px; } .stamp { width: 70px; } h1 { font-size: 23px; } }
 </style>
 </head>
 <body>
 <main>
-  <a class="card" href="https://ff-1204.github.io/doris-garden/">
-    <img src="https://ff-1204.github.io/doris-garden/og.png" alt="도리의 정원">
-    <div>
-      <h1>🌱 도리의 정원</h1>
-      <p>꽃을 기르고, 꽃잎을 말려, 차로 우려요.<br>천천히 돌보는 작은 정원 게임이에요.</p>
-      <span class="go">정원 가기</span>
-    </div>
-  </a>
+  <article class="letter">
+    <div class="stamp"><img src="https://ff-1204.github.io/doris-garden/og.png" alt=""></div>
+    <p class="kicker">초 대 장</p>
+    <h1>도리의 정원에<br>놀러 오세요</h1>
+    <p class="to">반가운 손님께,</p>
+    <p>마을 끝 작은 땅에 꽃씨를 뿌려 두었어요.</p>
+    <p>물을 주고 잡초를 뽑다 보면 꽃이 피고,</p>
+    <p>꽃잎을 거두어 말리면 향긋한 차가 돼요.</p>
+    <p>바쁜 날엔 잠깐 들러 물만 줘도 괜찮아요.</p>
+    <p>정원은 천천히, 당신을 기다릴게요.</p>
+    <p class="sign">— 농장 할머니 <b>드림</b></p>
+    <div class="go"><a class="seal" href="https://ff-1204.github.io/doris-garden/">🌱 정원 문 열기</a></div>
+    <p class="ps">추신. 주말에 들르면 정착금도 조금 넣어 둘게요.</p>
+  </article>
   <footer>ff-1204</footer>
 </main>
 </body>
