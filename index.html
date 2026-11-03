@@ -89,6 +89,8 @@
   .next .seed { font-size: 34px; }
   .next p { margin: 0; font-family: var(--display); font-size: 15px; line-height: 1.7; }
   .next b { font-size: 17px; }
+  .btn.star .st { color: #d9a520; }
+  .btn.star .stars { margin-left: 4px; padding-left: 8px; border-left: 1px solid var(--line); font-family: var(--body); font-size: 14px; }
   footer { margin-top: 40px; text-align: center; font-size: 12.5px; color: #8a7a68; }
   footer a { color: inherit; }
   @media (max-width: 520px) { .intro { padding: 32px 22px 26px; } .how { padding: 26px 20px; } .card { padding: 14px 14px 18px; } }
@@ -118,7 +120,7 @@
       <p class="desc">개발을 몰라도, 말로 부탁하면 AI가 작은 팀을 꾸려 계획부터 완성까지 해 줘요. 아래 프로젝트들은 모두 이 방식으로 만들었어요.</p>
       <div class="actions">
         <a class="btn leaf" href="https://ff-1204.github.io/claude-haejo/">소개 보기</a>
-        <a class="btn plain" href="https://github.com/ff-1204/claude-haejo">GitHub</a>
+        <a class="btn plain star" href="https://github.com/ff-1204/claude-haejo" data-repo="ff-1204/claude-haejo" title="GitHub에서 스타 주기"><span class="st" aria-hidden="true">★</span> Star<b class="stars" hidden></b></a>
       </div>
     </div>
     <ol class="steps">
@@ -148,7 +150,7 @@
         <div class="tags"><span>HTML·CSS·JS</span><span>도트 그림</span><span>GitHub Pages</span></div>
         <div class="actions">
           <a class="btn seal" href="https://ff-1204.github.io/doris-garden/">🌱 정원 문 열기</a>
-          <a class="btn plain" href="https://github.com/ff-1204/doris-garden">GitHub</a>
+          <a class="btn plain star" href="https://github.com/ff-1204/doris-garden" data-repo="ff-1204/doris-garden" title="GitHub에서 스타 주기"><span class="st" aria-hidden="true">★</span> Star<b class="stars" hidden></b></a>
         </div>
       </div>
     </article>
@@ -163,5 +165,14 @@
 
   <footer>ff-1204 · <a href="https://github.com/ff-1204">github.com/ff-1204</a></footer>
 </main>
+<script>
+// 카드마다 GitHub 스타 수 (실패하면 숫자 없이 단추만)
+document.querySelectorAll(".star[data-repo]").forEach(function (a) {
+  fetch("https://api.github.com/repos/" + a.dataset.repo).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d || typeof d.stargazers_count !== "number") return;
+    var b = a.querySelector(".stars"); b.textContent = d.stargazers_count; b.hidden = false;
+  }).catch(function () {});
+});
+</script>
 </body>
 </html>
