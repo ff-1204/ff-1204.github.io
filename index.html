@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ff-1204의 작업실</title>
-<meta name="description" content="말로 만들고, 천천히 가꿔요 — 도리의 정원과 claude-haejo를 만든 작은 작업실">
+<title>ff-1204의 작업실 — claude-haejo로 만든 것들</title>
+<meta name="description" content="말로 만들고, 천천히 가꿔요 — claude-haejo와 그 스킬로 만든 프로젝트들">
 <meta property="og:title" content="ff-1204의 작업실">
-<meta property="og:description" content="말로 만들고, 천천히 가꿔요 — 도리의 정원 · claude-haejo">
-<meta property="og:image" content="https://ff-1204.github.io/doris-garden/og.png">
+<meta property="og:description" content="claude-haejo와 그 스킬로 만든 프로젝트들">
+<meta property="og:image" content="https://ff-1204.github.io/claude-haejo/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
@@ -76,6 +76,20 @@
   .steps li b { font-family: var(--display); font-size: 16px; }
   .steps li p { margin: 6px 0 0; color: var(--muted); }
 
+
+  /* 도구 카드(넓게) */
+  .feature { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 8px 22px; align-items: start; transform: rotate(-.3deg); }
+  .feature .shot { align-self: start; margin-top: 4px; }
+  .feature .body { padding-top: 4px; }
+  @media (max-width: 760px) { .feature { grid-template-columns: minmax(0, 1fr); } .feature .body { padding-top: 14px; } }
+  .feature .steps { grid-column: 1 / -1; margin: 14px 0 0; }
+  .feature .steps li { padding: 10px 14px; }
+  .made-with { position: absolute; top: 26px; right: 26px; z-index: 1; font: 700 12px/1 var(--display); color: var(--leaf-dark); background: #fff9ee; border: 1.5px solid var(--leaf); border-radius: 999px; padding: 6px 10px; transform: rotate(4deg); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .next { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 280px; padding: 28px; border: 2px dashed rgba(251, 245, 232, .7); border-radius: 6px; text-align: center; color: var(--paper); }
+  @media (prefers-color-scheme: light) { .next { border-color: rgba(74, 58, 44, .35); color: var(--muted); } }
+  .next .seed { font-size: 34px; }
+  .next p { margin: 0; font-family: var(--display); font-size: 15px; line-height: 1.7; }
+  .next b { font-size: 17px; }
   footer { margin-top: 40px; text-align: center; font-size: 12.5px; color: #8a7a68; }
   footer a { color: inherit; }
   @media (max-width: 520px) { .intro { padding: 32px 22px 26px; } .how { padding: 26px 20px; } .card { padding: 14px 14px 18px; } }
@@ -88,18 +102,41 @@
   <header class="paper intro">
     <p class="kicker">f f - 1 2 0 4 의 작 업 실</p>
     <h1>말로 만들고,<br>천천히 가꿔요.</h1>
-    <p class="lead">AI와 한 팀이 되어 작은 게임과 도구를 만들어요. 기획은 쓸 사람의 하루에서 시작하고, 만든 건 직접 확인한 뒤에 내보내요.</p>
+    <p class="lead">“클로드, ~해줘.” 한 마디로 AI 팀에 맡겨 만든 것들을 모아 두는 곳이에요. 기획은 쓸 사람의 하루에서 시작하고, 만든 건 직접 확인한 뒤에 내보내요.</p>
     <div class="chips">
       <a class="dark" href="https://github.com/ff-1204">GitHub</a>
-      <span>웹 게임</span><span>AI 개발 도구</span><span>도트 그림</span>
+      <a href="#tool">만드는 도구</a><a href="#made">만든 것</a>
     </div>
   </header>
 
-  <p class="label">만든 것</p>
+  <p class="label" id="tool">만드는 도구</p>
+  <article class="paper card feature">
+    <span class="tape" aria-hidden="true"></span>
+    <a class="shot" href="https://ff-1204.github.io/claude-haejo/"><img src="https://ff-1204.github.io/claude-haejo/og.png" alt="claude-haejo: “클로드, ~해줘.” 글씨와 도트 꽃"></a>
+    <div class="body">
+      <div class="meta"><span>Claude Code 스킬</span><b>v1.0.0 · 한·영·일</b></div>
+      <h2>claude-haejo <small>클로드, ~해줘.</small></h2>
+      <p class="one">말 한마디로 기획부터 개발까지 맡겨요.</p>
+      <p class="desc">개발을 몰라도, 말로 부탁하면 AI가 작은 팀을 꾸려 계획부터 완성까지 해 줘요. 아래 프로젝트들은 모두 이 방식으로 만들었어요.</p>
+      <div class="actions">
+        <a class="btn leaf" href="https://ff-1204.github.io/claude-haejo/">소개 보기</a>
+        <a class="btn plain" href="https://github.com/ff-1204/claude-haejo">GitHub</a>
+      </div>
+    </div>
+    <ol class="steps">
+      <li><b>쓸 사람에서 시작</b><p>가상의 사용자들의 하루에서 필요한 것과 순서를 정해요.</p></li>
+      <li><b>AI 팀에 나눠 맡기기</b><p>일마다 AI 팀원 하나, 서로 꼬이지 않게 따로 만들어요.</p></li>
+      <li><b>검사하고 반영</b><p>요약·시험·범위·충돌을 확인한 것만 완성본에 합쳐요.</p></li>
+    </ol>
+  </article>
+
+  <p class="label" id="made">claude-haejo로 만든 것</p>
   <section class="projects">
 
+    <!-- 프로젝트 카드: 새 프로젝트는 이 article을 통째로 복사해 아래 "다음 자리" 바로 위에 붙이고 글과 주소만 바꿔요 -->
     <article class="paper card">
       <span class="tape" aria-hidden="true"></span>
+      <span class="made-with">claude-haejo로 만듦</span>
       <a class="shot" href="https://ff-1204.github.io/doris-garden/"><img style="image-rendering: pixelated" src="https://ff-1204.github.io/doris-garden/og.png" alt="도리의 정원 도트 그림: 꽃밭 가운데 정원 문"></a>
       <div class="body">
         <div class="meta"><span>웹 게임</span><b>v0.51.0 · 플레이 가능</b></div>
@@ -118,37 +155,12 @@
       </div>
     </article>
 
-    <article class="paper card">
-      <span class="tape" aria-hidden="true"></span>
-      <a class="shot" href="https://ff-1204.github.io/claude-haejo/"><img src="https://ff-1204.github.io/claude-haejo/og.png" alt="claude-haejo: “클로드, ~해줘.” 글씨와 도트 꽃"></a>
-      <div class="body">
-        <div class="meta"><span>Claude Code 스킬</span><b>v1.0.0 · 한·영·일</b></div>
-        <h2>claude-haejo <small>클로드, ~해줘.</small></h2>
-        <p class="one">말 한마디로 기획부터 개발까지 맡겨요.</p>
-        <p class="desc">개발을 몰라도, 말로 부탁하면 AI가 작은 팀을 꾸려 계획부터 완성까지 해 줘요. 팀원이 올린 결과는 팀장 AI가 검사하고, 사용자는 결재만 해요.</p>
-        <ul>
-          <li>쓸 사람의 하루에서 기능과 순서를 뽑는 기획</li>
-          <li>일마다 AI 팀원 하나, 네 가지 검사 뒤에 반영</li>
-        </ul>
-        <div class="tags"><span>Claude Code</span><span>AI 에이전트</span><span>오픈 소스</span></div>
-        <div class="actions">
-          <a class="btn leaf" href="https://ff-1204.github.io/claude-haejo/">소개 보기</a>
-          <a class="btn plain" href="https://github.com/ff-1204/claude-haejo">GitHub</a>
-        </div>
-      </div>
-    </article>
+    <!-- 다음 자리: 프로젝트가 생기면 이 카드 바로 위에 새 카드를 넣어요 -->
+    <div class="next">
+      <span class="seed" aria-hidden="true">🌱</span>
+      <p><b>다음 씨앗을 심는 중</b><br>새 프로젝트가 여기에 자라요.</p>
+    </div>
 
-  </section>
-
-  <p class="label">만드는 방식</p>
-  <section class="paper how">
-    <h2>도리의 정원은 claude-haejo로 만들어요.</h2>
-    <p>두 프로젝트는 이어져 있어요. 정원을 가꾸며 생긴 일하는 방식을 다듬어 claude-haejo로 묶었어요.</p>
-    <ol class="steps">
-      <li><b>쓸 사람에서 시작</b><p>가상의 사용자들의 하루를 그려, 필요한 것부터 순서를 정해요.</p></li>
-      <li><b>AI 팀에 나눠 맡기기</b><p>일마다 AI 팀원 하나, 서로 꼬이지 않게 따로 만들어요.</p></li>
-      <li><b>검사하고 반영</b><p>요약·시험·범위·충돌을 확인한 것만 완성본에 합쳐요.</p></li>
-    </ol>
   </section>
 
   <footer>ff-1204 · <a href="https://github.com/ff-1204">github.com/ff-1204</a></footer>
