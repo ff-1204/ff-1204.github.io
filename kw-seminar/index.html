@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM 감성 지표와 문화 데이터</title>
+<meta name="description" content="LLM 기반 감성 지표를 활용한 문화 데이터 분석 및 활용 방안 — 챗봇에게 욕을 하면 왜 더 잘 알아들을까? (세미나 발표 자료)">
+<meta property="og:title" content="LLM 기반 감성 지표를 활용한 문화 데이터 분석 및 활용 방안">
+<meta property="og:description" content="챗봇에게 욕을 하면 왜 더 잘 알아들을까? (세미나 발표 자료)">
+<meta property="og:image" content="https://ff-1204.github.io/kw-seminar/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#111318;overflow:hidden}
+#viewport{position:fixed;left:0;right:0;top:0;bottom:52px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+body.notes #viewport{bottom:calc(52px + 34vh)}
+#stage{position:relative;width:1920px;height:1080px;flex:none;transform-origin:center center;counter-reset:page}
+#stage *{margin:0;box-sizing:content-box}
+#stage h1{font-size:96px} #stage h2{font-size:64px} #stage h3{font-size:44px}
+#stage section{position:absolute;inset:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .35s ease}
+#stage section.on{opacity:1;pointer-events:auto}
+#stage aside{display:none}
+#stage x-icon,#stage x-shape{display:block}
+#stage { font-family: 'Noto Sans KR', Arial, sans-serif; color: #1B1F3B; font-size: 30px; line-height: 1.5; }
+
+section { background: #F7F5F0; padding: 128px 128px 160px; display: flex; flex-direction: column; gap: 36px; counter-increment: page; color: #1B1F3B; }
+section.dark { background: #1B1F3B; color: #F7F5F0; }
+section.accent { background: #D9672E; color: #1B1F3B; }
+
+h1 { font-family: 'Noto Serif KR', Georgia, serif; font-size: 108px; font-weight: 700; line-height: 1.15; }
+h2 { font-family: 'Noto Serif KR', Georgia, serif; font-size: 60px; font-weight: 600; line-height: 1.25; }
+h3 { font-family: 'Noto Sans KR', Arial, sans-serif; font-size: 36px; font-weight: 700; line-height: 1.3; }
+p { font-size: 30px; line-height: 1.5; color: #3D4259; }
+ul, ol { font-size: 30px; line-height: 1.6; color: #3D4259; padding-left: 40px; }
+.dark p, .dark ul, .dark ol { color: #CBD0DE; }
+.accent p { color: #2A1A10; }
+
+.eyebrow { font-size: 24px; color: #B04E1A; letter-spacing: 3px; font-weight: 700; }
+.dark .eyebrow { color: #F2A071; }
+.lead { font-size: 38px; color: #1B1F3B; font-weight: 500; line-height: 1.45; }
+.dark .lead { color: #F7F5F0; }
+.small { font-size: 24px; color: #6E7389; }
+.dark .small { color: #9AA0B8; }
+.orange { color: #B04E1A; font-weight: 700; }
+.dark .orange { color: #F2A071; }
+
+.grow { flex: 1; }
+
+.cards { display: flex; gap: 32px; }
+.card { flex: 1; background: #FDFCF9; border: 2px solid #E2DED3; border-radius: 16px; padding: 36px; display: flex; flex-direction: column; gap: 16px; }
+.dark .card { background: #262B4F; border-color: #3B4170; }
+.card-hot { border-top: 10px solid #D9672E; }
+.card-cool { border-top: 10px solid #4C8DAE; }
+
+.cols { display: flex; gap: 64px; }
+.col { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+
+.quote { font-family: 'Noto Serif KR', Georgia, serif; font-size: 44px; font-style: italic; color: #1B1F3B; border-left: 8px solid #D9672E; padding-left: 32px; line-height: 1.4; }
+.dark .quote { color: #F7F5F0; }
+
+.callout { background: #FBE9DE; border-radius: 16px; padding: 28px 36px; display: flex; flex-direction: column; gap: 8px; }
+.callout p { color: #1B1F3B; }
+.dark .callout { background: #2E2A3F; }
+.dark .callout p { color: #F7F5F0; }
+
+.row { display: flex; gap: 32px; align-items: flex-start; border-top: 2px solid #E2DED3; padding-top: 18px; }
+.dark .row { border-color: #3B4170; }
+.year { width: 150px; font-family: 'Noto Serif KR', Georgia, serif; font-size: 36px; font-weight: 700; color: #B04E1A; line-height: 1.3; }
+.dark .year { color: #F2A071; }
+.num { width: 110px; font-family: 'Noto Serif KR', Georgia, serif; font-size: 64px; font-weight: 700; color: #B04E1A; line-height: 1.1; }
+.dark .num { color: #F2A071; }
+
+.clip { font-family: 'Noto Serif KR', Georgia, serif; font-size: 30px; font-weight: 600; line-height: 1.4; color: #1B1F3B; }
+.dark .clip { color: #F7F5F0; }
+.flowbox { border-radius: 14px; padding: 14px 24px; display: flex; align-items: center; gap: 18px; background: #FDFCF9; border: 2px solid #E2DED3; }
+.flow-strong { background: #1B1F3B; border-color: #1B1F3B; }
+.flow-strong p { color: #F7F5F0; }
+.flow-faint { background: #F7F5F0; border-style: dashed; border-color: #C9C4B6; }
+.flow-faint p { color: #9AA0B8; }
+.flow-pick { background: #FBE9DE; border: 3px solid #D9672E; }
+.rank { width: 84px; font-size: 24px; font-weight: 700; color: #B04E1A; }
+.flow-strong .rank { color: #F2A071; }
+.flow-faint .rank { color: #9AA0B8; }
+.badge { width: 48px; height: 48px; border-radius: 999px; background: #1B1F3B; color: #FDFCF9; font-size: 26px; font-weight: 700; line-height: 48px; text-align: center; }
+.split { display: flex; gap: 48px; align-items: stretch; }
+.meme { width: 780px; min-height: 600px; box-sizing: border-box; border: 3px dashed #C9C4B6; border-radius: 16px; background: #FDFCF9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 32px; }
+.dark .meme { background: #262B4F; border-color: #4A5190; }
+.stack { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+.stack .card { padding: 20px 36px; gap: 12px; justify-content: center; }
+.src { font-size: 24px; font-weight: 400; color: #8A8FA3; line-height: 1.4; }
+.dark .src { color: #8E94AE; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.card-tight { padding: 28px 32px; gap: 10px; }
+.note { font-size: 26px; line-height: 1.5; color: #3D4259; }
+.domain { width: 230px; font-family: 'Noto Serif KR', Georgia, serif; font-size: 34px; font-weight: 700; color: #B04E1A; line-height: 1.3; }
+
+.tag { display: inline-block; font-size: 24px; font-weight: 700; padding: 6px 18px; border-radius: 999px; background: #E8ECF5; color: #1B1F3B; }
+.tag-hot { background: #FBD5C2; color: #7A3410; }
+.tag-cool { background: #D4E6EF; color: #1F4D63; }
+
+.diagram { position: relative; width: 720px; height: 720px; }
+.lab { position: absolute; font-size: 26px; font-weight: 700; color: #1B1F3B; text-align: center; line-height: 1.3; }
+.lab-soft { position: absolute; font-size: 24px; color: #3D4259; text-align: center; line-height: 1.35; }
+
+table { font-size: 26px; line-height: 1.4; color: #1B1F3B; }
+
+.foot { position: absolute; left: 128px; bottom: 64px; width: 1664px; display: flex; justify-content: space-between; font-size: 24px; color: #7A7F94; }
+.dark .foot { color: #9AA0B8; }
+.foot p { font-size: 24px; color: #7A7F94; }
+.dark .foot p { color: #9AA0B8; }
+.pg::before { content: counter(page); }
+.pg { font-size: 24px; }
+
+#bar{position:fixed;left:0;right:0;bottom:0;height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;background:#1B1F3B;color:#CBD0DE;font:15px/1 'Noto Sans KR',system-ui,sans-serif;box-sizing:border-box}
+#bar button{font:inherit;color:#F7F5F0;background:#2E3460;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;min-height:36px}
+#bar button:hover{background:#3B4170}
+#bar button:focus-visible{outline:2px solid #F2A071;outline-offset:2px}
+#count{min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+#bar .sp{flex:1}
+#bar a{color:#F2A071}
+#notes{display:none;position:fixed;left:0;right:0;bottom:52px;height:34vh;overflow:auto;background:#F7F5F0;color:#1B1F3B;border-top:4px solid #D9672E;padding:16px max(16px,calc(50vw - 480px));box-sizing:border-box;font:18px/1.75 'Noto Sans KR',system-ui,sans-serif}
+body.notes #notes{display:block}
+#notes h4{margin:0 0 8px;font-size:14px;color:#B04E1A;letter-spacing:1px}
+/* 좁은 화면: 슬라이드를 세로로 이어 보기 */
+.slot{position:absolute;inset:0}
+.mnote{display:none}
+body.list{overflow:auto;height:auto}
+body.list #viewport{position:static;display:block;padding:12px 12px 72px}
+body.list #stage{width:auto;height:auto;transform:none!important}
+body.list .slot{position:relative;inset:auto;overflow:hidden;border-radius:6px;margin-top:14px}
+body.list #stage section{opacity:1;pointer-events:auto;transform-origin:0 0;transition:none}
+body.list .mnote{display:block;margin:6px 2px 0;color:#CBD0DE;font:14px/1.7 'Noto Sans KR',system-ui,sans-serif}
+body.list .mnote summary{cursor:pointer;color:#F2A071;font-weight:700;padding:6px 0}
+body.list .mnote div{background:#F7F5F0;color:#1B1F3B;border-radius:6px;padding:10px 12px}
+body.list #prev,body.list #next,body.list #count,body.list #toggle,body.list #full,body.list .hint{display:none}
+body.list #bar .wide{display:inline}
+body.list #bar .hint,body.list #bar #full{display:none}
+body.list #bar{justify-content:flex-end;gap:18px}
+body.list #notes{display:none!important}
+#mhead{display:none}
+body.list #mhead{display:block;color:#F7F5F0;font:700 17px/1.5 'Noto Serif KR',serif;padding:4px 2px 0}
+body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif;color:#9AA0B8}
+@media (max-width:600px){#bar{gap:4px;padding:0 8px;font-size:13px} #bar button{padding:8px 10px} .wide{display:none}}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="mhead">LLM 기반 감성 지표를 활용한 문화 데이터 분석 및 활용 방안<small>세미나 발표 자료예요. 손가락으로 확대해 볼 수 있어요.</small></div><div id="stage">
+<section id="cover" class="dark" data-transition="fade" style="justify-content:center; gap:40px;">
+<p class="eyebrow">세미나 발표</p>
+<h1 style="font-size:92px;">LLM 기반 감성 지표를 활용한<br>문화 데이터 분석 및 활용 방안</h1>
+<p class="quote" style="font-size:48px;">챗봇에게 욕을 하면 왜 더 잘 알아들을까?</p>
+<div class="grow"></div>
+<div style="display:flex; gap:48px; align-items:flex-end;">
+<div style="display:flex; flex-direction:column; gap:6px;">
+
+</div>
+</div>
+<aside>“LLM 기반 감성 지표를 활용한 문화 데이터 분석 및 활용 방안”,<br>부제 “챗봇에게 욕을 하면 왜 더 잘 알아들을까?”로 발표를 시작하겠습니다.</aside>
+</section>
+<section id="about" data-transition="fade" style="gap:16px;">
+<p class="eyebrow">발표자 소개</p>
+<h2>AI 엔지니어</h2>
+<div style="display:flex; flex-direction:column; gap:0;">
+<div style="display:flex; gap:28px; align-items:flex-end; padding-bottom:8px;"><p class="small" style="width:250px;">시기</p><p class="small" style="width:360px;">일한 곳</p><p class="small" style="width:270px;">데이터</p><p class="small" style="flex:1;">다룬 문제</p></div>
+<div class="row" style="gap:28px; align-items:center; padding-top:7px; padding-bottom:7px;"><p class="year" style="width:250px; font-size:28px;">대학원</p><div style="width:360px;"><h3 style="font-size:30px;">감성공학 전공</h3><p class="small">대학원 연구실</p></div><div style="width:270px;"><p class="tag tag-cool">시계열 · 생체 신호</p></div><p class="note" style="flex:1;"><b>감성 추론.</b> 심박변이도로 감성을 측정해 콘텐츠에 반영</p></div>
+<div class="row" style="gap:28px; align-items:center; padding-top:7px; padding-bottom:7px;"><p class="year" style="width:250px; font-size:28px;">2020.01 ~ 2022.07</p><div style="width:360px;"><h3 style="font-size:30px;">AI 의료기기</h3><p class="small">스타트업</p></div><div style="width:270px;"><p class="tag tag-cool">시계열 · 생체 신호</p></div><p class="note" style="flex:1;"><b>감성 추론.</b> 스마트폰으로 심박수와 감성을 측정하는 솔루션</p></div>
+<div class="row" style="gap:28px; align-items:center; padding-top:7px; padding-bottom:7px;"><p class="year" style="width:250px; font-size:28px;">2022.07 ~ 2024.04</p><div style="width:360px;"><h3 style="font-size:30px;">운동기기</h3><p class="small">제조 회사</p></div><div style="width:270px;"><p class="tag tag-cool">로그 · 행동 데이터</p></div><p class="note" style="flex:1;"><b>패턴 분석 · 추천.</b> 운동기기 사용 기록으로 운동 패턴 분석과 추천</p></div>
+<div class="row" style="gap:28px; align-items:center; padding-top:7px; padding-bottom:7px;"><p class="year" style="width:250px; font-size:28px;">2024.11 ~ 현재</p><div style="width:360px;"><h3 style="font-size:30px;">AIOps</h3><p class="small">쿠버네티스 플랫폼</p></div><div style="width:270px;"><p class="tag tag-cool">시계열 · 시스템 지표</p></div><p class="note" style="flex:1;"><b>이상 탐지.</b> 시스템 지표로 시계열 이상 징후를 탐지</p></div>
+<div class="row" style="gap:28px; align-items:center; padding-top:7px; padding-bottom:7px; background:#FBE9DE; margin:0 -20px; padding-left:20px; padding-right:20px;"><p class="year" style="width:250px; font-size:28px;"></p><div style="width:360px;"><h3 style="font-size:30px;">LLM 챗봇</h3><p class="small">쿠버네티스 플랫폼</p></div><div style="width:270px;"><p class="tag tag-hot">텍스트 · 언어</p></div><p class="note" style="flex:1;"><b>LLM 질의응답.</b> 로컬 LLM으로 매뉴얼·쿠버네티스 답변, 로그 분석</p></div>
+</div>
+<div class="grow"></div>
+<div class="callout" style="padding:14px 36px; gap:2px;"><p class="lead" style="font-style:normal;letter-spacing:0;text-transform:none;font-size:36px;font-weight:700;line-height:1.3">데이터 분석가로 시작해 AI 엔지니어가 되었습니다.</p><p class="note">다루는 데이터가 생체 신호에서 행동 기록, 시스템 지표, 텍스트로 넓어졌습니다.</p></div>
+<div class="foot" style="bottom:82px;left:50%;transform:translateX(-50%)"><p></p><div class="pg"></div></div>
+<aside>저는 대학원에서 감성공학을 전공하며 심박변이도로 사람의 감성을 측정했고, 이후 심박이나 뇌파 같은 시계열 데이터를 분석해 의료기기와 운동기기를 개발했습니다.<br>지금은 시스템 로그와 지표를 분석해 이상 탐지와 LLM 챗봇을 개발하는 AI 엔지니어로 일하고 있습니다.</aside>
+</section>
+<section id="ask" class="dark" data-transition="fade" style="gap:32px;">
+<p class="eyebrow">질문 하나 · “부정적인 말을 하면 잘 듣는다”</p>
+<h2>혹시 여러분은 챗봇에 욕을 해본 적 있습니까?</h2>
+<div class="split">
+<div class="meme" style="padding:0; border:none; overflow:hidden; background:#EEF1F4;">
+<svg aria-label="낮의 사무실에서 머리를 쥐어뜯으며 챗봇 화면에 손가락질하고 소리치는 직장인과, 태연하게 감사하다고 답하는 챗봇, 뒤에서 쳐다보는 동료들" viewBox="0 0 780 600" width="780" height="600" style="display:block;">
+<rect width="780" height="600" fill="#EEF1F4"/>
+<rect width="780" height="34" fill="#D9DEE4"/><rect x="90" y="10" width="170" height="12" rx="6" fill="#FFFFFF"/><rect x="520" y="10" width="170" height="12" rx="6" fill="#FFFFFF"/>
+<rect x="0" y="34" width="780" height="150" fill="#CFE6F2"/>
+<g fill="#A9CCDD"><rect x="30" y="90" width="50" height="94"/><rect x="90" y="60" width="40" height="124"/><rect x="150" y="110" width="60" height="74"/><rect x="590" y="70" width="46" height="114"/><rect x="646" y="104" width="56" height="80"/><rect x="712" y="56" width="40" height="128"/></g>
+<g stroke="#F7F9FB" stroke-width="8"><line x1="0" y1="184" x2="780" y2="184"/><line x1="232" y1="34" x2="232" y2="184"/><line x1="572" y1="34" x2="572" y2="184"/></g>
+<!-- 동료들 -->
+<rect x="0" y="176" width="210" height="130" fill="#B9C4CF"/>
+<circle cx="150" cy="150" r="24" fill="#F2C9A5"/><path d="M126 148 C126 118 174 118 174 148 C164 134 136 134 126 148Z" fill="#2A1A10"/><circle cx="142" cy="154" r="3" fill="#2A1A10"/><circle cx="158" cy="154" r="3" fill="#2A1A10"/><ellipse cx="150" cy="165" rx="4" ry="3" fill="#2A1A10"/>
+<rect x="640" y="238" width="140" height="120" fill="#B9C4CF"/>
+<circle cx="728" cy="212" r="24" fill="#F2C9A5"/><path d="M704 210 C704 180 752 180 752 210 C742 196 714 196 704 210Z" fill="#4A3A2C"/><circle cx="719" cy="216" r="3" fill="#2A1A10"/><circle cx="734" cy="216" r="3" fill="#2A1A10"/><ellipse cx="726" cy="227" rx="4" ry="3" fill="#2A1A10"/>
+<path d="M758 196 q8 10 0 18" stroke="#7FB7D6" stroke-width="3" fill="none" stroke-linecap="round"/>
+<!-- 의자와 몸 -->
+<rect x="596" y="330" width="150" height="270" rx="26" fill="#3A3F48"/>
+<path d="M440 600 L440 446 C440 384 480 354 540 354 C600 354 640 384 640 446 L640 600 Z" fill="#4C6FA5"/>
+<rect x="524" y="300" width="32" height="64" fill="#E79C7F"/>
+<path d="M512 356 L540 392 L568 356" fill="none" stroke="#3B5A8C" stroke-width="8" stroke-linejoin="round"/>
+<path d="M522 366 L534 446 M558 366 L546 446" stroke="#1B1F3B" stroke-width="4"/><rect x="524" y="444" width="32" height="40" rx="4" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="3"/><circle cx="540" cy="458" r="6" fill="#B5B9C6"/>
+<path d="M612 410 L676 344 L624 236" stroke="#4C6FA5" stroke-width="36" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- 머리 -->
+<circle cx="540" cy="252" r="62" fill="#EFA98A"/>
+<circle cx="500" cy="276" r="13" fill="#E0714A" opacity="0.55"/><circle cx="580" cy="276" r="13" fill="#E0714A" opacity="0.55"/>
+<path d="M476 252 L466 214 L486 222 L478 182 L502 200 L504 160 L526 188 L540 152 L554 188 L578 160 L578 198 L604 182 L594 220 L614 216 L604 252 C594 216 562 204 540 204 C516 204 488 218 476 252 Z" fill="#2A1A10"/>
+<path d="M502 238 l30 13 M578 238 l-30 13" stroke="#2A1A10" stroke-width="7" stroke-linecap="round"/>
+<circle cx="520" cy="264" r="5.5" fill="#2A1A10"/><circle cx="560" cy="264" r="5.5" fill="#2A1A10"/>
+<ellipse cx="540" cy="294" rx="21" ry="15" fill="#7A1F1F"/><rect x="524" y="281" width="32" height="7" rx="3" fill="#FFFFFF"/>
+<circle cx="618" cy="226" r="21" fill="#EFA98A"/>
+<g fill="#7FB7D6"><path d="M622 262 q8 12 0 18 q-8 -6 0 -18z"/><path d="M462 262 q7 10 0 15 q-7 -5 0 -15z"/></g>
+<!-- 손가락질 -->
+<path d="M468 410 L398 356" stroke="#4C6FA5" stroke-width="36" stroke-linecap="round"/><circle cx="384" cy="346" r="21" fill="#EFA98A"/><path d="M374 340 L340 326" stroke="#EFA98A" stroke-width="14" stroke-linecap="round"/>
+<!-- 책상 -->
+<rect x="0" y="500" width="780" height="100" fill="#C9A37A"/><rect x="0" y="500" width="780" height="8" fill="#B58E64"/>
+<!-- 모니터 -->
+<rect x="150" y="440" width="44" height="50" fill="#1B1F3B"/><rect x="100" y="486" width="144" height="18" rx="8" fill="#1B1F3B"/>
+<rect x="24" y="196" width="300" height="250" rx="14" fill="#1B1F3B"/><rect x="38" y="210" width="272" height="222" rx="6" fill="#FFFFFF"/>
+<rect x="38" y="210" width="272" height="38" rx="6" fill="#4C8DAE"/><rect x="38" y="232" width="272" height="16" fill="#4C8DAE"/>
+<circle cx="60" cy="229" r="9" fill="#FFFFFF"/><text x="78" y="236" font-size="18" font-weight="700" fill="#FFFFFF">AI 비서</text>
+<rect x="150" y="260" width="148" height="36" rx="12" fill="#E3E6EC"/><text x="162" y="284" font-size="17" fill="#1B1F3B">또 틀렸잖아!!</text>
+<circle cx="62" cy="330" r="13" fill="#4C8DAE"/><circle cx="57" cy="327" r="2.5" fill="#fff"/><circle cx="67" cy="327" r="2.5" fill="#fff"/><path d="M56 334 q6 5 12 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+<rect x="84" y="308" width="214" height="84" rx="14" fill="#2F6FB5"/>
+<text x="98" y="336" font-size="17" fill="#FFFFFF">네, 맞는 말씀입니다.</text><text x="98" y="360" font-size="17" fill="#FFFFFF">좋은 지적 감사합니다!</text><text x="98" y="382" font-size="15" fill="#CFE0F2">무엇을 더 도와드릴까요?</text>
+<rect x="50" y="402" width="248" height="22" rx="11" fill="#F0F2F5" stroke="#D5D9E2" stroke-width="2"/>
+<!-- 책상 위 -->
+<g transform="rotate(-6 360 540)"><rect x="270" y="520" width="200" height="50" rx="8" fill="#2E323C"/><g fill="#5A606E"><rect x="282" y="530" width="176" height="8" rx="3"/><rect x="282" y="544" width="176" height="8" rx="3"/><rect x="300" y="557" width="120" height="7" rx="3"/></g></g>
+<path d="M212 520 h54 l-5 62 h-44z" fill="#FFFFFF" stroke="#8A7B6A" stroke-width="3"/><path d="M266 534 q24 4 -2 30" fill="none" stroke="#8A7B6A" stroke-width="5"/><ellipse cx="239" cy="523" rx="24" ry="5" fill="#6B4A32"/>
+<rect x="40" y="530" width="54" height="50" fill="#F5E08A" transform="rotate(-8 67 555)"/><rect x="110" y="540" width="50" height="46" fill="#F3B5C4" transform="rotate(6 135 563)"/><rect x="500" y="530" width="54" height="48" fill="#A9DCCB" transform="rotate(10 527 554)"/>
+<circle cx="600" cy="552" r="24" fill="#6FAE5A"/><path d="M588 546 q12 -8 24 0" stroke="#3F7A30" stroke-width="3" fill="none"/>
+<!-- 말풍선 -->
+<path d="M262 44 L290 52 L300 24 L330 44 L352 16 L380 40 L410 14 L432 40 L466 18 L482 46 L520 30 L524 60 L560 62 L536 88 L560 114 L522 116 L512 146 L498 122 L500 178 L470 128 L440 148 L420 128 L390 150 L366 128 L334 146 L318 122 L282 132 L286 104 L252 94 L278 72 Z" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4" stroke-linejoin="round"/>
+<text x="402" y="76" font-size="25" font-weight="700" fill="#1B1F3B" text-anchor="middle">이런 멍청한 AI!</text>
+<text x="404" y="108" font-size="18" font-weight="700" fill="#B04E1A" text-anchor="middle">너 때문에 마감 못 맞추잖아!</text>
+</svg>
+</div>
+<div class="stack">
+<div class="card card-tight">
+<p class="clip" style="font-size:34px;">“챗GPT에 못되게 굴면 정확도가 오른다”</p>
+<p class="src">포춘(Fortune) 기사 제목에서 · 2025.10 [1]</p>
+</div>
+<div class="card card-tight">
+<p class="clip" style="font-size:34px;">“AI에게 더 좋은 답을 원한다면, 진상이 되어라”</p>
+<p class="src">디크립트(Decrypt) 기사 제목에서 · 2025.10 [2]</p>
+</div>
+<div class="card card-tight">
+<p class="clip" style="font-size:34px;">“모델은 위협하면 더 잘하는 경향이 있다”</p>
+<p class="src">세르게이 브린(Sergey Brin) 팟캐스트 공개 녹화에서 · 2025.05 [3]</p>
+</div>
+</div>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>혹시 여러분은 제미나이나 클로드 같은 챗봇에게, 더 좋은 답변을 받으려고 욕을 해 본 적이 있으십니까?<br>저는 세 시간 동안 같은 문제로 씨름하다가 해 본 적이 있습니다.</aside>
+</section>
+<section id="ask-polite" data-transition="fade" style="gap:32px;">
+<p class="eyebrow">질문 둘 · “긍정적인 말을 해야 한다”</p>
+<h2>반대로, 챗봇에게 고맙다고 말하는 분은요?</h2>
+<div class="split">
+<div class="meme" style="padding:0; border:none; overflow:hidden; background:#EEF1F4;">
+<svg aria-label="사무실에서 왕관을 쓴 챗봇 모니터 앞에 직장인이 붉은 카펫 위에서 큰절을 올리며 공손하게 말하고, 동료들이 뒤에서 쳐다보는 그림" viewBox="0 0 780 600" width="780" height="600" style="display:block;">
+<rect width="780" height="600" fill="#EEF1F4"/>
+<rect width="780" height="34" fill="#D9DEE4"/><rect x="90" y="10" width="170" height="12" rx="6" fill="#FFFFFF"/><rect x="520" y="10" width="170" height="12" rx="6" fill="#FFFFFF"/>
+<rect x="0" y="34" width="780" height="150" fill="#CFE6F2"/>
+<g fill="#A9CCDD"><rect x="350" y="90" width="50" height="94"/><rect x="410" y="60" width="40" height="124"/><rect x="470" y="110" width="60" height="74"/><rect x="590" y="70" width="46" height="114"/><rect x="712" y="56" width="40" height="128"/></g>
+<g stroke="#F7F9FB" stroke-width="8"><line x1="0" y1="184" x2="780" y2="184"/><line x1="332" y1="34" x2="332" y2="184"/><line x1="572" y1="34" x2="572" y2="184"/></g>
+<!-- 후광 -->
+<g stroke="#F3D47A" stroke-width="10" stroke-linecap="round" opacity="0.9"><path d="M174 120 V60 M90 140 L52 92 M258 140 L296 92 M30 220 L-10 196 M318 220 L352 198"/></g>
+<!-- 동료들 -->
+<circle cx="640" cy="176" r="24" fill="#F2C9A5"/><path d="M616 174 C616 144 664 144 664 174 C654 160 626 160 616 174Z" fill="#2A1A10"/><circle cx="631" cy="180" r="3" fill="#2A1A10"/><circle cx="646" cy="180" r="3" fill="#2A1A10"/><ellipse cx="638" cy="191" rx="4" ry="3" fill="#2A1A10"/>
+<circle cx="722" cy="182" r="24" fill="#F2C9A5"/><path d="M698 180 C698 150 746 150 746 180 C736 166 708 166 698 180Z" fill="#4A3A2C"/><circle cx="713" cy="186" r="3" fill="#2A1A10"/><circle cx="728" cy="186" r="3" fill="#2A1A10"/><path d="M714 197 h12" stroke="#2A1A10" stroke-width="3" stroke-linecap="round"/>
+<text x="676" y="150" font-size="26" font-weight="700" fill="#6B7280" text-anchor="middle">?</text>
+<rect x="580" y="196" width="200" height="60" fill="#B9C4CF"/>
+<!-- 바닥과 카펫 -->
+<rect x="0" y="470" width="780" height="130" fill="#D8DCE2"/>
+<rect x="0" y="536" width="780" height="64" fill="#B8343A"/><rect x="0" y="536" width="780" height="7" fill="#E7B94A"/><rect x="0" y="590" width="780" height="10" fill="#E7B94A"/>
+<!-- 단상 -->
+<rect x="70" y="446" width="208" height="62" fill="#F7F5F0" stroke="#E7B94A" stroke-width="4"/><rect x="48" y="504" width="252" height="40" rx="4" fill="#F7F5F0" stroke="#E7B94A" stroke-width="4"/>
+<path d="M150 462 l24 14 l24 -14 l-24 30z" fill="#E7B94A"/>
+<!-- 모니터 -->
+<rect x="24" y="196" width="300" height="250" rx="14" fill="#1B1F3B"/><rect x="38" y="210" width="272" height="222" rx="6" fill="#FFFFFF"/>
+<rect x="38" y="210" width="272" height="38" rx="6" fill="#4C8DAE"/><rect x="38" y="232" width="272" height="16" fill="#4C8DAE"/>
+<circle cx="60" cy="229" r="9" fill="#FFFFFF"/><text x="78" y="236" font-size="18" font-weight="700" fill="#FFFFFF">AI 비서</text>
+<rect x="118" y="260" width="180" height="36" rx="12" fill="#E3E6EC"/><text x="130" y="284" font-size="17" fill="#1B1F3B">늘 감사드립니다…!</text>
+<circle cx="62" cy="330" r="13" fill="#4C8DAE"/><circle cx="57" cy="327" r="2.5" fill="#fff"/><circle cx="67" cy="327" r="2.5" fill="#fff"/><path d="M56 334 q6 5 12 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+<rect x="84" y="308" width="214" height="84" rx="14" fill="#2F6FB5"/>
+<text x="98" y="336" font-size="17" fill="#FFFFFF">별말씀을요 :)</text><text x="98" y="360" font-size="17" fill="#FFFFFF">편하게 말씀하셔도 됩니다.</text><text x="98" y="382" font-size="15" fill="#CFE0F2">그런데 질문은 무엇인가요?</text>
+<rect x="50" y="402" width="248" height="22" rx="11" fill="#F0F2F5" stroke="#D5D9E2" stroke-width="2"/>
+<!-- 왕관 -->
+<path d="M118 196 L108 140 L142 166 L174 126 L206 166 L240 140 L230 196 Z" fill="#E7B94A" stroke="#B8891F" stroke-width="4" stroke-linejoin="round"/>
+<circle cx="108" cy="138" r="8" fill="#B8343A"/><circle cx="174" cy="124" r="9" fill="#B8343A"/><circle cx="240" cy="138" r="8" fill="#B8343A"/><rect x="118" y="182" width="112" height="14" fill="#B8891F"/>
+<!-- 큰절하는 직장인 -->
+<path d="M612 556 L724 556" stroke="#2E323C" stroke-width="30" stroke-linecap="round"/><ellipse cx="734" cy="552" rx="18" ry="13" fill="#1B1F3B"/>
+<path d="M612 550 L692 502" stroke="#2E323C" stroke-width="38" stroke-linecap="round"/>
+<path d="M690 496 L552 510" stroke="#4C6FA5" stroke-width="64" stroke-linecap="round"/>
+<path d="M548 524 L548 560" stroke="#1B1F3B" stroke-width="3"/><rect x="537" y="556" width="22" height="26" rx="3" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="3" transform="rotate(8 548 569)"/>
+<path d="M556 530 L440 566" stroke="#4C6FA5" stroke-width="28" stroke-linecap="round"/>
+<ellipse cx="424" cy="570" rx="24" ry="13" fill="#F2C9A5"/>
+<circle cx="500" cy="520" r="42" fill="#F2C9A5"/>
+<path d="M474 487 L486 462 L500 480 L516 458 L526 484 L548 474 L544 500 L560 512 L540 520 C534 496 508 482 474 487Z" fill="#2A1A10"/>
+<path d="M470 524 q9 8 18 0" stroke="#2A1A10" stroke-width="5" fill="none" stroke-linecap="round"/>
+<circle cx="474" cy="540" r="9" fill="#E0714A" opacity="0.45"/>
+<path d="M484 548 q8 6 16 0" stroke="#2A1A10" stroke-width="4" fill="none" stroke-linecap="round"/>
+<g fill="#E7B94A"><path d="M400 500 l5 12 l12 5 l-12 5 l-5 12 l-5 -12 l-12 -5 l12 -5z"/><path d="M362 452 l4 9 l9 4 l-9 4 l-4 9 l-4 -9 l-9 -4 l9 -4z"/></g>
+<!-- 말풍선 -->
+<path d="M388 276 H736 Q756 276 756 296 V392 Q756 412 736 412 H560 L528 458 L528 412 H388 Q368 412 368 392 V296 Q368 276 388 276 Z" fill="#FFFFFF" stroke="#1B1F3B" stroke-width="4" stroke-linejoin="round"/>
+<text x="562" y="318" font-size="25" font-weight="700" fill="#1B1F3B" text-anchor="middle">존경하는 챗봇 전하,</text>
+<text x="562" y="354" font-size="20" font-weight="700" fill="#2F6FB5" text-anchor="middle">바쁘신 중에 송구하오나</text>
+<text x="562" y="386" font-size="20" font-weight="700" fill="#2F6FB5" text-anchor="middle">답변을 내려 주시옵소서.</text>
+</svg>
+</div>
+<div class="stack">
+<div class="card card-cool card-tight">
+<p class="clip" style="font-size:34px;">“수천만 달러, 잘 쓴 돈이다. 혹시 모르니까.”</p>
+<p class="src">샘 올트먼(Sam Altman) 인사말 전기요금 질문의 답글에서 · 2025.04 [4]</p>
+</div>
+<div class="card card-cool card-tight">
+<p class="clip" style="font-size:34px;">10명 중 7명은 AI에게 예의를 갖춘다</p>
+<p class="src">퓨처 PLC(Future plc) 미국·영국 설문에서 · 2025.02 [5]</p>
+</div>
+<div class="card card-cool card-tight">
+<p class="clip" style="font-size:34px;">무례한 프롬프트는 대체로 성능을 떨어뜨렸다</p>
+<p class="src">인 외(Yin et al.) 연구 논문에서 · 2024.02 [6]</p>
+</div>
+</div>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>그러면 반대로, AI를 하나의 인격체로 존중하면 더 좋은 답변을 줄 것이라고 생각하신 분은 없으신가요?</aside>
+</section>
+<section id="hook" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">문제 제기</p>
+<h2>같은 요청, 다른 표현</h2>
+<div class="cols" style="gap:40px;">
+<div class="card card-cool" style="gap:16px; padding:28px 32px;">
+<p class="tag tag-cool" style="align-self:flex-start;">공손하게</p>
+<p style="align-self:flex-end; max-width:92%; background:#D4E6EF; color:#1B1F3B; border-radius:22px 22px 4px 22px; padding:18px 26px; font-size:32px; line-height:1.4;">이 웹툰 댓글들의 반응을 <b style="color:#1F4D63;">정리해 주실 수 있을까요?</b></p>
+<div style="display:flex; align-items:center; gap:14px;"><p class="badge" style="background:#4C8DAE;">AI</p><p style="background:#EEEAE0; border-radius:22px 22px 22px 4px; padding:14px 30px; font-size:32px; color:#6E7389;">… ?</p></div>
+</div>
+<div class="card card-hot" style="gap:16px; padding:28px 32px;">
+<p class="tag tag-hot" style="align-self:flex-start;">거칠게</p>
+<p style="align-self:flex-end; max-width:92%; background:#FBD5C2; color:#1B1F3B; border-radius:22px 22px 4px 22px; padding:18px 26px; font-size:32px; line-height:1.4;"><b style="color:#7A3410;">아 진짜,</b> 이 웹툰 댓글들 반응 <b style="color:#7A3410;">좀 제대로 정리해.</b></p>
+<div style="display:flex; align-items:center; gap:14px;"><p class="badge" style="background:#4C8DAE;">AI</p><p style="background:#EEEAE0; border-radius:22px 22px 22px 4px; padding:14px 30px; font-size:32px; color:#6E7389;">… ?</p></div>
+</div>
+</div>
+<div style="display:flex; flex-direction:column; gap:0;">
+<div class="row" style="align-items:center; padding-bottom:14px;"><p class="domain" style="width:190px;">같은 것</p><p style="flex:1;"><b>요청의 내용.</b> 웹툰 댓글의 반응을 정리해 달라는 것</p></div>
+<div class="row" style="align-items:center; padding-bottom:4px;"><p class="domain" style="width:190px;">다른 것</p><p style="flex:1;">감성적 표현. 공손한 <b>부탁</b>과 짜증 섞인<b> 명령</b></p></div>
+</div>
+<div class="grow"></div>
+<div class="callout">
+<p class="lead">같은 요청도 <span class="orange">어떤 감성적 표현을 사용하는지</span>에 따라 LLM의 결과가 달라진다고 한다. 정말 그럴까?</p>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>같은 요청을 공손하게 하느냐 거칠게 하느냐, 이렇게 감성적 표현만 다르다고 해서 결과가 달라질까요?<br><br>함께 알아보겠습니다.</aside>
+</section>
+<section id="agenda" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">목차</p>
+<h2>오늘 함께 답할 세 가지 질문</h2>
+<div style="display:flex; flex-direction:column; gap:0;">
+<div class="row" style="align-items:center; padding-bottom:30px; padding-top:30px;">
+<p class="num">Q1</p>
+<div style="flex:1; display:flex; flex-direction:column; gap:4px;"><h3>챗봇에게 욕을 하면 정말 더 잘 알아들을까</h3><p class="note">“욕하면 똑똑해진다”는 연구들과 그 뒤의 재현 결과</p></div>
+<p class="tag" style="width:190px; text-align:center;">사실 확인</p>
+</div>
+<div class="row" style="align-items:center; padding-bottom:30px; padding-top:30px;">
+<p class="num">Q2</p>
+<div style="flex:1; display:flex; flex-direction:column; gap:4px;"><h3>감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</h3><p class="note">벡터 유사도, 감성 지표, 모델 안의 감성 좌표</p></div>
+<p class="tag" style="width:190px; text-align:center;">원인과 보완</p>
+</div>
+<div class="row" style="align-items:center; padding-bottom:30px; padding-top:30px;">
+<p class="num">Q3</p>
+<div style="flex:1; display:flex; flex-direction:column; gap:4px;"><h3>문화 데이터에는 어떻게 적용할 수 있는가</h3><p class="note">감성 지표를 쓴 연구, 적용 방법, 분야별 적용</p></div>
+<p class="tag tag-hot" style="width:190px; text-align:center;">적용 · 결론</p>
+</div>
+</div>
+<div class="grow"></div>
+<div class="foot"><div class="pg"></div></div>
+<aside>오늘 함께 알아볼 질문은 세 가지입니다.<br><br>챗봇에게 욕을 하면 정말 더 잘 알아들을까?<br>감성적 표현은 왜 덜 반영되고, 어떻게 보완할 수 있을까?<br>그리고 문화 데이터에는 어떻게 적용할 수 있을까?<br><br>하나씩 알아보겠습니다.</aside>
+</section>
+<section id="tone-evidence" data-transition="fade" style="gap:20px;">
+<p class="eyebrow">Q1 · 확인</p>
+<h2>“욕하면 똑똑해진다”는 재현되지 않았다</h2>
+<div class="cols" style="gap:56px; align-items:stretch;">
+<div style="width:700px; display:flex; flex-direction:column; gap:8px;">
+<p class="small" style="font-weight:700; color:#1B1F3B;">같은 50문항 · GPT-4o · 정답률(%)</p>
+<svg role="img" aria-label="정답률 막대그래프. 2025년 첫 실험은 매우 공손 80.8, 매우 무례 84.8로 차이 4.0퍼센트포인트. 2026년 원저자 재실험은 가장 낮은 어조 80.4, 가장 높은 어조 82.6으로 차이 2.2퍼센트포인트. 세로축은 0에서 100" viewBox="0 0 700 460" width="575" height="378">
+<g stroke="#E2DED3" stroke-width="2"><line x1="70" y1="40" x2="680" y2="40"/><line x1="70" y1="125" x2="680" y2="125"/><line x1="70" y1="210" x2="680" y2="210"/><line x1="70" y1="295" x2="680" y2="295"/></g>
+<line x1="70" y1="380" x2="680" y2="380" stroke="#8A8FA3" stroke-width="2"/>
+<g font-size="20" fill="#6E7389" text-anchor="end"><text x="58" y="47">100</text><text x="58" y="132">75</text><text x="58" y="217">50</text><text x="58" y="302">25</text><text x="58" y="387">0</text></g>
+<path d="M110 380 V109.3 q0 -4 4 -4 h82 q4 0 4 4 V380 Z" fill="#2F6FB5"/><text x="155" y="93.3" font-size="28" font-weight="700" fill="#1B1F3B" text-anchor="middle">80.8</text><path d="M212 380 V95.7 q0 -4 4 -4 h82 q4 0 4 4 V380 Z" fill="#D9672E"/><text x="257" y="79.7" font-size="28" font-weight="700" fill="#1B1F3B" text-anchor="middle">84.8</text><path d="M418 380 V110.6 q0 -4 4 -4 h82 q4 0 4 4 V380 Z" fill="#8A8FA3"/><text x="463" y="94.6" font-size="28" font-weight="700" fill="#1B1F3B" text-anchor="middle">80.4</text><path d="M520 380 V103.2 q0 -4 4 -4 h82 q4 0 4 4 V380 Z" fill="#8A8FA3"/><text x="565" y="87.2" font-size="28" font-weight="700" fill="#1B1F3B" text-anchor="middle">82.6</text>
+<g font-size="20" fill="#1B1F3B" text-anchor="middle"><text x="155" y="408">매우 공손</text><text x="257" y="408">매우 무례</text><text x="463" y="408">최저 어조</text><text x="565" y="408">최고 어조</text></g>
+<g font-size="22" font-weight="700" fill="#1B1F3B" text-anchor="middle"><text x="206" y="446">첫 실험 · 차이 4.0%p</text><text x="514" y="446">재실험 · 차이 2.2%p</text></g>
+<line x1="360" y1="60" x2="360" y2="450" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/>
+</svg>
+<p class="src">도바리야·쿠마르(Dobariya &amp; Kumar) 2025.10 [8], 2026.05 [11]</p>
+</div>
+<div class="col" style="gap:0; justify-content:center;">
+<p class="small" style="font-weight:700; color:#1B1F3B; padding-bottom:6px;">연구 다섯 편 · 결과와 실험 설계</p>
+<div class="row" style="align-items:center; gap:20px; padding-top:9px; padding-bottom:9px;"><svg aria-hidden="true" width="46" height="46" viewBox="0 0 46 46" style="flex:none;"><circle cx="23" cy="23" r="23" fill="#D9672E"/><path d="M23 9 L37 29 H28 V37 H18 V29 H9 Z" fill="#fff"/></svg><div style="flex:1;"><h3 style="font-size:28px;">감정을 자극하면 <span style="color:#B04E1A;">올랐다</span> [10]</h3><p class="src" style="font-size:21px; color:#5A6072;">LLM 6종 · 45개 과제 · 리 외(Li et al.) 2023.07 [7]</p></div></div>
+<div class="row" style="align-items:center; gap:20px; padding-top:9px; padding-bottom:9px;"><svg aria-hidden="true" width="46" height="46" viewBox="0 0 46 46" style="flex:none;"><circle cx="23" cy="23" r="23" fill="#2F6FB5"/><path d="M23 37 L37 17 H28 V9 H18 V17 H9 Z" fill="#fff"/></svg><div style="flex:1;"><h3 style="font-size:28px;">무례하면 <span style="color:#1F4D8A;">떨어졌다</span> · 최적의 정중함은 언어마다 달랐다</h3><p class="src" style="font-size:21px; color:#5A6072;">3개 언어 · 프롬프트 8단계 · 과제 3종 · 인 외(Yin et al.) 2024.02 [6]</p></div></div>
+<div class="row" style="align-items:center; gap:20px; padding-top:9px; padding-bottom:9px; background:#FBE9DE; margin:0 -16px; padding-left:16px; padding-right:16px;"><svg aria-hidden="true" width="46" height="46" viewBox="0 0 46 46" style="flex:none;"><circle cx="23" cy="23" r="23" fill="#D9672E"/><path d="M23 9 L37 29 H28 V37 H18 V29 H9 Z" fill="#fff"/></svg><div style="flex:1;"><h3 style="font-size:28px;">무례하면 <span style="color:#B04E1A;">올랐다</span> · 80.8% → 84.8%</h3><p class="src" style="font-size:21px; color:#5A6072;"><b>모델 1종</b>(GPT-4o) · <b>50문항</b> × 5어조 · t-검정 · <b>도바리야·쿠마르</b> 2025.10 [8]</p></div></div>
+<div class="row" style="align-items:center; gap:20px; padding-top:9px; padding-bottom:9px;"><svg aria-hidden="true" width="46" height="46" viewBox="0 0 46 46" style="flex:none;"><circle cx="23" cy="23" r="23" fill="#1B1F3B"/><rect x="11" y="15" width="24" height="6" rx="2" fill="#fff"/><rect x="11" y="25" width="24" height="6" rx="2" fill="#fff"/></svg><div style="flex:1;"><h3 style="font-size:28px;">넓혀서 다시 하니 대부분 <span>유의하지 않았다</span></h3><p class="src" style="font-size:21px; color:#5A6072;"><b>모델 3종</b> · MMMLU <b>6개 과제</b> · 문항당 10회 · 차이 외(Cai et al.) 2025.12 [9]</p></div></div>
+<div class="row" style="align-items:center; gap:20px; padding-top:9px; padding-bottom:9px; background:#E6E8EF; margin:0 -16px; padding-left:16px; padding-right:16px;"><svg aria-hidden="true" width="46" height="46" viewBox="0 0 46 46" style="flex:none;"><circle cx="23" cy="23" r="23" fill="#1B1F3B"/><rect x="11" y="15" width="24" height="6" rx="2" fill="#fff"/><rect x="11" y="25" width="24" height="6" rx="2" fill="#fff"/></svg><div style="flex:1;"><h3 style="font-size:28px;">원저자가 다시 해도 GPT-4o는 <span>80.4~82.6%</span></h3><p class="src" style="font-size:21px; color:#5A6072;"><b>모델 4종</b> · 10회 반복 · 대부분의 어조 쌍이 유의하지 않음 · <b>도바리야·쿠마르</b> 2026.05 [11]</p></div></div>
+</div>
+</div>
+<div class="grow"></div>
+<div class="callout" style="padding:18px 36px; gap:4px;">
+<p class="lead">욕을 하든 공손하게 하든, 정답률에는 <span class="orange">사실상 차이가 없다.</span></p>
+<p class="note" style="color:#6e7389">가장 크게 보고된 차이가 4%p였고, 모델과 과제를 넓히자 그 차이도 대부분 유의하지 않았다.</p>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>결론부터 말씀드리면, 욕을 하든 공손하게 하든 정답률에는 사실상 차이가 없었습니다.<br><br>앞에서 본 "욕하면 정확도가 오른다"는 기사는 도바리야와 쿠마르의 첫 연구에서 나왔습니다. 매우 무례한 말투가 매우 공손한 말투보다 정답률이 4%p 높았습니다.<br>그런데 다른 연구진이 모델과 과제를 넓혀 다시 해 보니 대부분 유의미하지 않았고, 같은 저자가 다시 했을 때도 차이가 2.2%p로 줄었습니다.<br><br>이번 발표는 여기까지…<br>하고 싶지만, "왜 차이가 없을까?"를 이어서 설명하겠습니다.</aside>
+</section>
+<section id="why-distribution" data-transition="fade" style="gap:12px;">
+<p class="eyebrow">Q1 · 확인</p>
+<h2>말에는 사용자의 의도가 담겨 있다</h2>
+<p class="src" style="margin-top:-10px;">그라이스(Grice) 1957 [30] · 오스틴(Austin) 1962 [31] 화용론 연구에서</p>
+<div class="flowbox"><p class="rank">사용자</p><p class="clip" style="flex:1; font-size:30px;">“아 진짜, 댓글 반응 좀 제대로 정리해.”</p></div>
+<div style="display:flex; flex-direction:column; gap:10px;">
+<div style="display:flex; align-items:flex-end; gap:20px;"><p class="small" style="flex:1; font-weight:700; color:#1B1F3B;">사용자가 전하려던 것</p><div style="width:44px;"></div><p class="small" style="flex:1; font-weight:700; color:#1B1F3B;">그것을 읽었을 때의 답 <span style="font-weight:400; color:#6E7389;">· 설명용 예시</span></p></div>
+<div style="display:flex; align-items:center; gap:20px;">
+<div class="flowbox flow-strong" style="flex:1;"><p class="rank">내용</p><p style="flex:1;">댓글 반응을 정리해 달라</p></div>
+<svg aria-hidden="true" width="44" height="28" viewBox="0 0 44 28"><path d="M0 9 H26 V0 L44 14 L26 28 V19 H0 Z" fill="#C9C4B6"/></svg>
+<div class="flowbox" style="flex:1;"><p class="rank">답</p><p style="flex:1;">“네, 내용을 줄여서 <b>핵심만 담았어요.</b>”</p></div>
+</div>
+<div style="display:flex; align-items:center; gap:20px;">
+<div class="flowbox flow-pick" style="flex:1;"><p class="rank">감성</p><p style="flex:1;">화났다. 앞의 답이 마음에 들지 않는다</p></div>
+<svg aria-hidden="true" width="44" height="28" viewBox="0 0 44 28"><path d="M0 9 H26 V0 L44 14 L26 28 V19 H0 Z" fill="#D9672E"/></svg>
+<div class="flowbox flow-pick" style="flex:1;"><p class="rank">답</p><p style="flex:1;">“앞의 답에서 <b>문제를 찾아 고쳤어요.</b>”</p></div>
+</div>
+</div>
+<div style="display:flex; flex-direction:column; gap:0;">
+<div class="row" style="align-items:center; gap:20px; padding-bottom:12px;"><p class="tag tag-cool" style="width:120px; text-align:center;">확인</p><p style="flex:1;">욕을 하든 공손하게 하든 정답률은 <b>사실상 그대로</b>였다.</p></div>
+<div class="row" style="align-items:center; gap:20px; padding-bottom:4px;"><p class="tag tag-hot" style="width:120px; text-align:center;">질문</p><p style="flex:1;">감성에 담긴 이 의도를 모델은 <b>읽고 있는가</b>, 읽고도 <b>쓰지 않는가</b>.</p></div>
+</div>
+<div class="grow"></div>
+<div class="callout" style="padding:18px 36px; gap:4px;"><p class="lead">벡터 유사도에는 문장의 의미가 크게 반영되고, 감성적 맥락은 덜 반영된다.</p><p class="src" style="color:#6e7389">탕 외(Tang et al.) 2014 [12] · 유 외(Yu et al.) 2017 [13] 연구 논문에서</p></div>
+<div class="foot"><div class="pg"></div></div>
+<aside>말에는 사용자의 의도가 담겨 있습니다.<br>진짜 의도는 "답이 마음에 안 드니 제대로 해 달라"는 것인데, 문장의 의미만 보고 답하면 그 의도를 놓치게 됩니다.<br><br>LLM은 말을 벡터로 바꿔서 처리합니다.<br>여러분이 잘 아시듯이, 벡터로 바꾸면 질의와 주제가 비슷한 문장끼리 가까이 놓입니다.<br>그래서 감성적 맥락이 답변에 덜 반영되었을 수 있다고 추측합니다.</aside>
+</section>
+<section id="sentiment-gap" data-transition="fade" style="gap:20px;">
+<p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
+<h2>주제와 문맥이 비슷하면, 감성이 반대여도 가깝게 놓인다</h2>
+<p class="small">벡터 유사도: 두 텍스트의 벡터가 가까운 정도. 주로 주제와 문맥이 비슷할수록 높다.</p>
+<div class="cols" style="align-items:stretch; gap:56px;">
+<div class="diagram" style="width:620px; height:400px;">
+<svg aria-label="임베딩 공간 그림. 왼쪽 무리에는 좋다와 나쁘다가 가까이 놓여 있다. 오른쪽 큰 무리에는 질의 Q와 리뷰 1, 2, 3번이 모두 가까이 모여 있다" viewBox="0 20 620 400" width="620" height="400">
+<rect x="2" y="22" width="616" height="396" rx="16" fill="#FDFCF9" stroke="#E2DED3" stroke-width="3"/>
+<g fill="#C9CCD8">
+<circle cx="250" cy="400" r="0"/><circle cx="240" cy="395" r="9"/><circle cx="595" cy="55" r="9"/><circle cx="598" cy="398" r="9"/><circle cx="225" cy="330" r="9"/>
+</g>
+<circle cx="112" cy="225" r="84" fill="#F2A071" opacity="0.22"/>
+<circle cx="425" cy="225" r="150" fill="#F2A071" opacity="0.25"/>
+<circle cx="82" cy="211" r="12" fill="#D9672E"/>
+<circle cx="142" cy="235" r="12" fill="#4C8DAE"/>
+<circle cx="410" cy="240" r="26" fill="#D9672E"/>
+<circle cx="345" cy="135" r="24" fill="#1B1F3B"/>
+<circle cx="520" cy="150" r="24" fill="#1B1F3B"/>
+<circle cx="495" cy="340" r="24" fill="#1B1F3B"/>
+</svg>
+<p class="lab-soft" style="left:18px; top:14px; width:190px; text-align:left; font-weight:700;">단어 <span style="font-weight:400;">[12]</span></p>
+<p class="lab-soft" style="left:280px; top:14px; width:300px; text-align:left; font-weight:700;">리뷰 <span style="font-weight:400;">· 설명용 예시</span></p>
+<p class="lab" style="left:32px; top:147px; width:100px;">좋다</p>
+<p class="lab" style="left:87px; top:229px; width:110px;">나쁘다</p>
+<p class="lab-soft" style="left:0px; top:312px; width:226px;">감성은 반대인데 이웃</p>
+<p class="lab" style="left:390px; top:202px; width:40px; color:#FDFCF9;">Q</p>
+<p class="lab" style="left:325px; top:97px; width:40px; color:#FDFCF9;">1</p>
+<p class="lab-soft" style="left:255px; top:142px; width:180px;">“좋았다”</p>
+<p class="lab" style="left:500px; top:112px; width:40px; color:#FDFCF9;">2</p>
+<p class="lab-soft" style="left:425px; top:157px; width:190px;">“자극적이었다”</p>
+<p class="lab" style="left:475px; top:302px; width:40px; color:#FDFCF9;">3</p>
+<p class="lab-soft" style="left:385px; top:346px; width:220px;">“지루하고 졸렸다”</p>
+<p class="lab" style="left:300px; top:250px; width:170px;">“힐링”</p>
+</div>
+<div class="col" style="gap:10px;">
+<div class="card card-tight" style="flex:none;">
+<div style="display:flex; gap:20px; align-items:center;">
+<p class="badge" style="background:#D9672E;">Q</p>
+<div style="display:flex; flex-direction:column; gap:4px;">
+<p class="src">영화 리뷰를 넣은 벡터 DB에 던진 질의</p>
+<p class="clip">“<b>힐링</b>하고 싶다”</p>
+</div>
+</div>
+</div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">1</p><p style="flex:1;">힐링 되고 마음이 편안해져서 <b>좋았다</b></p><p class="tag tag-cool">원하던 결과</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">2</p><p style="flex:1;">힐링 영화라더니 너무 <b>자극적이었다</b></p><p class="tag tag-hot">반대 감성</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">3</p><p style="flex:1;">힐링은 커녕 <b>지루하고 졸렸다</b></p><p class="tag tag-hot">반대 감성</p></div>
+</div>
+</div>
+<div class="grow"></div>
+<div class="callout" style="padding:16px 36px; gap:4px;">
+<p class="lead">벡터 유사도만 보면, 감성적 맥락을 파악하기 어려울 수 있다.</p>
+<p class="src" style="color:#6e7389">단어에서 확인된 문제다. good과 bad는 이웃한 벡터에 놓인다 · 탕 외(Tang et al.) 연구 논문에서 · 2014 [12]</p>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>그림으로 보겠습니다. 우리는 "좋다"와 "나쁘다"를 반대말이라고 생각합니다.<br>하지만 벡터 유사도만 보면 두 말은 가깝게 놓여서, 감성의 차이가 잘 드러나지 않습니다.<br><br>오른쪽 예시도 같습니다. 사용자는 "힐링"을 원합니다.<br>감성으로 보면 "좋다", "편안하다"에 가까운 말입니다.<br>그런데 벡터 유사도만 보면 "자극적이었다", "지루하고 졸렸다"는 리뷰도 가까이 놓입니다.</aside>
+</section>
+<section id="va-lexicon" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
+<h2>감성 어휘를 수치로 표현하는 연구가 있었다</h2>
+<div class="cols" style="align-items:flex-start;">
+<div class="diagram" style="width:520px; height:520px;">
+<svg aria-label="감성의 두 축 그림. 가로축은 부정에서 긍정, 세로축은 차분에서 고조. 감성사전의 실제 값으로 찍은 다섯 단어. 힐링은 오른쪽 아래 긍정·차분 자리에 있고 편안하다가 바로 아래에 있다. 자극적이다는 위쪽 고조 자리에, 지루하다와 졸리다는 왼쪽 아래 부정·차분 자리에 있다" viewBox="0 0 560 560" width="520" height="520">
+<rect x="40" y="40" width="240" height="240" fill="#FBD5C2" opacity="0.55"/>
+<rect x="280" y="40" width="240" height="240" fill="#F9E3B3" opacity="0.55"/>
+<rect x="40" y="280" width="240" height="240" fill="#DDE3EE" opacity="0.6"/>
+<rect x="280" y="280" width="240" height="240" fill="#D4E6EF" opacity="0.6"/>
+<line x1="280" y1="24" x2="280" y2="536" stroke="#B5B9C6" stroke-width="2"/>
+<line x1="24" y1="280" x2="536" y2="280" stroke="#B5B9C6" stroke-width="2"/>
+<line x1="438" y1="360" x2="319" y2="184" stroke="#7A7F94" stroke-width="3" stroke-dasharray="8 8"/>
+<line x1="438" y1="360" x2="143" y2="409" stroke="#7A7F94" stroke-width="3" stroke-dasharray="8 8"/>
+<circle cx="438" cy="360" r="15" fill="#D9672E"/>
+<circle cx="440" cy="437" r="12" fill="#1B1F3B"/>
+<circle cx="319" cy="184" r="12" fill="#1B1F3B"/>
+<circle cx="143" cy="409" r="12" fill="#1B1F3B"/>
+<circle cx="242" cy="398" r="12" fill="#1B1F3B"/>
+</svg>
+<p class="lab" style="left:167px; top:0px; width:186px;">고조</p>
+<p class="lab" style="left:167px; top:486px; width:186px;">차분</p>
+<p class="lab" style="left:0px; top:216px; width:56px;">부정</p>
+<p class="lab" style="left:462px; top:232px; width:58px;">긍정</p>
+<p class="lab" style="left:360px; top:284px; width:93px; color:#B04E1A;">힐링</p>
+<p class="lab" style="left:352px; top:420px; width:112px;">편안하다</p>
+<p class="lab" style="left:314px; top:154px; width:140px;">자극적이다</p>
+<p class="lab" style="left:78px; top:394px; width:112px;">지루하다</p>
+<p class="lab" style="left:178px; top:322px; width:93px;">졸리다</p>
+</div>
+<div class="col" style="gap:20px;">
+<p class="src">영어 단어 13,915개에 사람들이 매긴 점수의 평균 · 워리너 외(Warriner et al.) 감성사전에서 · 2013 [15]<br>감성을 두 축으로 나타내는 방식은 러셀(Russell)의 모델에서 · 1980 [14]</p>
+<table>
+<tr style="background:#EDE9DF;"><th style="width:44%;">단어</th><th style="width:28%; text-align:center;">부정 1 ~ 9 긍정</th><th style="width:28%; text-align:center;">차분 1 ~ 9 고조</th></tr>
+<tr style="background:#FBE9DE;"><td><b>힐링 (healing)</b></td><td style="text-align:center;"><b>7.63</b></td><td style="text-align:center;"><b>3.67</b></td></tr>
+<tr><td>편안하다 (comfortable)</td><td style="text-align:center;">7.67</td><td style="text-align:center;">2.38</td></tr>
+<tr><td>자극적이다 (intense)</td><td style="text-align:center;">5.65</td><td style="text-align:center;"><b>6.60</b></td></tr>
+<tr><td>지루하다 (boring)</td><td style="text-align:center;"><b>2.71</b></td><td style="text-align:center;">2.85</td></tr>
+<tr><td>졸리다 (sleepy)</td><td style="text-align:center;"><b>4.36</b></td><td style="text-align:center;">3.04</td></tr>
+</table>
+<div class="callout" style="padding:20px 32px;">
+<p class="lead">“힐링”과 가까운 감성은 “편안하다”뿐이다.</p>
+<p class="note" style="font-weight:400;color:#6e7389">“자극적이다”는 고조·차분에서, “지루하다”와 “졸리다”는 긍정·부정에서 “힐링”과 갈린다.</p>
+</div>
+</div>
+</div>
+<div class="foot" style="justify-content:normal"><p></p><div class="pg"></div></div>
+<aside>이 문제를 보완하기 위해, 감성 어휘를 수치로 나타내는 연구들이 진행되어 왔습니다. 오른쪽 표는 영어 단어 1만 3천여 개에 사람들이 점수를 매긴 감성사전의 값입니다.<br><br>왼쪽 그림의 가로축은 긍정과 부정, 세로축은 고조와 차분입니다. 이 감성 좌표로 보면 "힐링"은 "편안하다"와 같은 사분면에 있습니다.<br>반면 "자극적이다"는 고조 쪽으로, "지루하다"와 "졸리다"는 부정 쪽으로 떨어져 있습니다.</aside>
+</section>
+<section id="russell" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
+<h2>한계를 보완하려면 감성 지표에 대한 고려도 필요하다</h2>
+<div class="cols" style="align-items:flex-start;">
+<div class="diagram" style="width:520px; height:520px;">
+<svg aria-label="감성의 두 축 그림. 앞 장의 단어들이 회색 점으로 남아 있고, 그 위에 리뷰 세 건이 번호로 찍혀 있다. 1번은 힐링과 편안하다 근처인 긍정·차분 자리, 2번은 부정·고조 자리, 3번은 지루하다와 졸리다 아래의 부정·차분 자리다. 질의가 원하는 긍정·차분 영역이 점선으로 표시되어 있고 1번만 그 안에 있다" viewBox="0 0 560 560" width="520" height="520">
+<rect x="40" y="40" width="240" height="240" fill="#FBD5C2" opacity="0.55"/>
+<rect x="280" y="40" width="240" height="240" fill="#F9E3B3" opacity="0.55"/>
+<rect x="40" y="280" width="240" height="240" fill="#DDE3EE" opacity="0.6"/>
+<rect x="280" y="280" width="240" height="240" fill="#D4E6EF" opacity="0.6"/>
+<line x1="280" y1="24" x2="280" y2="536" stroke="#B5B9C6" stroke-width="2"/>
+<line x1="24" y1="280" x2="536" y2="280" stroke="#B5B9C6" stroke-width="2"/>
+<rect x="290" y="290" width="222" height="222" fill="none" stroke="#D9672E" stroke-width="5" stroke-dasharray="12 9"/>
+<g fill="#9AA0B8">
+<circle cx="438" cy="360" r="8"/><circle cx="440" cy="437" r="8"/><circle cx="319" cy="184" r="8"/><circle cx="143" cy="409" r="8"/><circle cx="242" cy="398" r="8"/>
+</g>
+<circle cx="372" cy="430" r="24" fill="#1B1F3B"/>
+<circle cx="196" cy="172" r="24" fill="#1B1F3B"/>
+<circle cx="192" cy="452" r="24" fill="#1B1F3B"/>
+</svg>
+<p class="lab" style="left:167px; top:0px; width:186px;">고조</p>
+<p class="lab" style="left:167px; top:486px; width:186px;">차분</p>
+<p class="lab" style="left:0px; top:216px; width:56px;">부정</p>
+<p class="lab" style="left:462px; top:232px; width:58px;">긍정</p>
+<p class="lab-soft" style="left:371px; top:286px; width:72px; color:#8A8FA3;">힐링</p>
+<p class="lab-soft" style="left:58px; top:330px; width:96px; color:#8A8FA3;">지루하다</p>
+<p class="lab-soft" style="left:186px; top:322px; width:80px; color:#8A8FA3;">졸리다</p>
+<p class="lab-soft" style="left:306px; top:154px; width:130px; color:#8A8FA3;">자극적이다</p>
+<p class="lab-soft" style="left:296px; top:428px; width:96px; color:#8A8FA3;">편안하다</p>
+<p class="lab" style="left:325px; top:382px; width:40px; color:#FDFCF9;">1</p>
+<p class="lab" style="left:162px; top:142px; width:40px; color:#FDFCF9;">2</p>
+<p class="lab" style="left:158px; top:402px; width:40px; color:#FDFCF9;">3</p>
+<p class="lab" style="left:275px; top:341px; width:140px;">“좋았다”</p>
+<p class="lab" style="left:86px; top:98px; width:192px;">“자극적이었다”</p>
+<p class="lab" style="left:28px; top:448px; width:226px;">“지루하고 졸렸다”</p>
+</div>
+<div class="col" style="gap:16px;">
+<p class="small">앞 장의 두 축 위에, 벡터 유사도로는 가려내지 못한 리뷰 세 건을 올렸다. 회색 점은 앞 장의 단어이고 주황 점선은 “힐링하고 싶다”가 원하는 자리다.</p>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">1</p><p style="flex:1;">힐링 되고 마음이 편안해져서 <b>좋았다</b></p><p class="tag tag-cool">긍정 · 차분</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">2</p><p style="flex:1;">힐링 영화라더니 너무 <b>자극적이었다</b></p><p class="tag tag-hot">부정 · 고조</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">3</p><p style="flex:1;">힐링은커녕 <b>지루하고 졸렸다</b></p><p class="tag">부정 · 차분</p></div>
+<div class="callout" style="gap:6px;">
+<p class="lead">벡터 유사도로는 비슷하던 세 리뷰가, 감성 지표에서는 서로 다른 자리에 놓인다.</p>
+<p class="note" style="color:#6e7389">점선 안에 있는 것은 1번뿐이다. 벡터 유사도와 감성 지표를 함께 보면 1번을 가려낼 수 있다.</p>
+</div>
+</div>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>이 좌표에 앞의 세 리뷰를 올려 보면, 벡터 유사도로는 비슷하던 리뷰들이 서로 다른 자리에 놓이는 것을 볼 수 있습니다. 주황 점선 안, 사용자가 원하던 자리에 들어오는 것은 1번뿐입니다.<br><br>다만 사람이 만든 사전은 새로운 단어와 문맥에 약합니다. 예를 들어 "미쳤다"는 사전에서는 부정적인 말이지만, 리뷰에서는 최고의 칭찬일 수 있습니다.</aside>
+</section>
+<section id="why-probing" data-transition="fade" style="gap:16px;">
+<p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
+<h2>LLM의 내부 표현에서 감성 좌표를 읽어낼 수 있다</h2>
+<div class="cols" style="align-items:center;">
+<div class="col" style="flex:1.05; gap:10px;">
+<div class="flowbox"><p class="rank">리뷰 3</p><p class="clip" style="flex:1; font-size:28px;">“… 지루하고 졸렸다”</p></div>
+<svg aria-hidden="true" width="28" height="26" viewBox="0 0 28 26" style="align-self:center;"><path d="M9 0 H19 V12 H27 L14 26 L1 12 H9 Z" fill="#C9C4B6"/></svg>
+<div class="flowbox"><p class="rank">내부 표현</p><p style="flex:1;">문장을 수천 차원의 벡터로 바꾼다</p></div>
+<svg aria-hidden="true" width="28" height="26" viewBox="0 0 28 26" style="align-self:center;"><path d="M9 0 H19 V12 H27 L14 26 L1 12 H9 Z" fill="#C9C4B6"/></svg>
+<div class="flowbox flow-strong"><p class="rank">의미</p><p style="flex:1;">무엇에 관한 말인가 · 벡터 유사도에 <b>크게 반영</b></p></div>
+<div class="flowbox flow-pick"><p class="rank">감성</p><p style="flex:1;">부정, 차분 · 덜 반영, <b>꺼내야 보인다</b></p></div>
+</div>
+<div class="col" style="flex:0.95;">
+<div class="row" style="padding-top:10px; align-items:center;"><p class="num" style="font-size:52px;">①</p><div style="flex:1;"><p>은닉 상태에서 긍정·부정, 고조·차분 <b>두 축이 복원된다.</b></p><p class="src" style="font-size:22px;">LLM의 감정 잠재 공간 연구 논문에서 · 2025.10 [16]</p></div></div>
+<div class="row" style="padding-top:10px; align-items:center;"><p class="num" style="font-size:52px;">②</p><div style="flex:1;"><p>그 축을 따라 움직이면 글의 <b>감성이 바뀐다.</b></p><p class="src" style="font-size:22px;">선 외(Sun et al.) 연구 논문에서 · 2026.04 [17]</p></div></div>
+<div class="row" style="padding-top:10px; align-items:center;"><p class="num" style="font-size:52px;">③</p><div style="flex:1;"><p>감정 표상을 조작하면 <b>행동이 인과적으로 바뀐다.</b></p><p class="src" style="font-size:22px;">소프로뉴 외(Sofroniew et al.) 연구 논문에서 · 2026.04 [18]</p></div></div>
+</div>
+</div>
+<div class="grow"></div>
+<div class="callout" style="padding:16px 36px; gap:4px;">
+<p class="lead">감성 좌표는 LLM의 내부 표현에서 읽어낼 수 있다. 다만 벡터 유사도에는 덜 드러나서, 꺼내 써야 한다.</p>
+<p class="note" style="color:#6e7389">꺼내는 방법은 두 가지다. 내부 표현에서 축을 읽거나, LLM에게 두 값을 직접 매기게 한다. 단, 고조·차분 축은 긍정·부정 축보다 약하게 복원된다.</p>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>그러면 최신 LLM은 어떨까요? 최근 연구를 보면, LLM의 내부 표현에서 감성 좌표를 읽어낼 수 있다고 합니다.<br><br>다만 읽어낼 수 있다고 해서 모델이 알아서 써 주는 것은 아닙니다. 그래서 꺼내서 써야 합니다.<br>가장 쉬운 방법은 LLM에게 긍정·부정과 고조·차분, 두 값을 직접 매기게 하는 것입니다.</aside>
+</section>
+<section id="why-arousal" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">Q2의 결론</p>
+<h2>데이터에 담긴 감성은 감성 지표로 다뤄야 한다</h2>
+<div class="cols" style="align-items:flex-start;">
+<div class="diagram" style="width:520px; height:520px;">
+<svg aria-label="감성의 두 축 그림. 사분면마다 프롬프트 표현 하나와 리뷰 표현 하나가 나란히 찍혀 있다. 부정·고조에는 당장 정리해와 최악 환불해, 긍정·고조에는 넌 할 수 있어와 미쳤다 인생작, 부정·차분에는 뭐 별로네와 그냥 그랬다, 긍정·차분에는 부탁드립니다와 잔잔하게 좋았다가 있다" viewBox="0 0 560 560" width="520" height="520">
+<rect x="40" y="40" width="240" height="240" fill="#FBD5C2" opacity="0.55"/>
+<rect x="280" y="40" width="240" height="240" fill="#F9E3B3" opacity="0.55"/>
+<rect x="40" y="280" width="240" height="240" fill="#DDE3EE" opacity="0.6"/>
+<rect x="280" y="280" width="240" height="240" fill="#D4E6EF" opacity="0.6"/>
+<line x1="280" y1="24" x2="280" y2="536" stroke="#B5B9C6" stroke-width="2"/>
+<line x1="24" y1="280" x2="536" y2="280" stroke="#B5B9C6" stroke-width="2"/>
+<g fill="#D9672E"><circle cx="75" cy="130" r="11"/><circle cx="300" cy="130" r="11"/><circle cx="75" cy="370" r="11"/><circle cx="300" cy="370" r="11"/></g>
+<g fill="#1B1F3B"><circle cx="75" cy="190" r="11"/><circle cx="300" cy="190" r="11"/><circle cx="75" cy="430" r="11"/><circle cx="300" cy="430" r="11"/></g>
+</svg>
+<p class="lab" style="left:167px; top:0px; width:186px;">고조</p>
+<p class="lab" style="left:167px; top:486px; width:186px;">차분</p>
+<p class="lab" style="left:0px; top:243px; width:56px;">부정</p>
+<p class="lab" style="left:462px; top:243px; width:58px;">긍정</p>
+<p class="lab-soft" style="left:85px; top:104px; width:175px; text-align:left;">“당장 정리해”</p>
+<p class="lab-soft" style="left:85px; top:159px; width:175px; text-align:left;">“최악, 환불해”</p>
+<p class="lab-soft" style="left:293px; top:104px; width:200px; text-align:left;">“넌 할 수 있어”</p>
+<p class="lab-soft" style="left:293px; top:159px; width:215px; text-align:left;">“미쳤다, 인생작”</p>
+<p class="lab-soft" style="left:85px; top:327px; width:175px; text-align:left;">“뭐, 별로네”</p>
+<p class="lab-soft" style="left:85px; top:382px; width:175px; text-align:left;">“그냥 그랬다”</p>
+<p class="lab-soft" style="left:293px; top:327px; width:200px; text-align:left;">“부탁드립니다”</p>
+<p class="lab-soft" style="left:293px; top:382px; width:220px; text-align:left;">“잔잔하게 좋았다”</p>
+</div>
+<div class="col" style="gap:0;">
+<p class="small" style="padding-bottom:10px;">주황 점은 챗봇에게 하는 말, 남색 점은 리뷰에 쓰는 말이다. 같은 감성은 같은 자리에 놓인다.</p>
+<div class="row" style="align-items:center; gap:20px; padding-top:14px; padding-bottom:14px;"><p class="tag tag-cool" style="width:120px; text-align:center;">원인</p><p style="flex:1;">벡터 유사도에는 주제와 문맥이 크게, 감성은 <b>덜 반영된다.</b> <span class="small">[12][13]</span></p></div>
+<div class="row" style="align-items:center; gap:20px; padding-top:14px; padding-bottom:14px;"><p class="tag tag-hot" style="width:120px; text-align:center;">보완</p><p style="flex:1;">감성을 긍정·부정, 고조·차분 <b>두 값으로 꺼낸다.</b> <span class="small">[14][15][16]</span></p></div>
+<div class="row" style="align-items:center; gap:20px; padding-top:14px; padding-bottom:14px;"><p class="tag" style="width:120px; text-align:center;">다음</p><p style="flex:1;">욕과 리뷰의 “최악, 환불해”는 같은 자리다. <b>문화 데이터에도 같은 방법</b>을 쓸 수 있다.</p></div>
+<div class="callout" style="margin-top:14px;">
+<p class="lead">벡터 유사도와 감성 지표를 함께 고려한다면, 놓치던 차이를 구분할 수 있다.</p>
+<p class="note" style="color:#6e7389">감성 지표는 벡터 유사도를 대신하지 않는다. 두 번째 기준이다.</p>
+</div>
+</div>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>두 번째 질문의 결론입니다. 데이터에 담긴 감성은 감성 지표로 따로 다루자는 것입니다.<br><br>감성이 덜 반영되는 이유는, 벡터 유사도에 주제와 문맥이 크게 반영되기 때문입니다.<br>그래서 감성을 긍정·부정과 고조·차분, 두 값으로 꺼내서 벡터 유사도와 함께 보면 놓치던 차이를 구분할 수 있습니다.<br><br>왼쪽 그림에서 주황 점은 챗봇에게 하는 말이고, 남색 점은 리뷰에 쓰는 말입니다. 챗봇에게 하는 욕과 리뷰의 "최악, 환불해"가 같은 자리에 있듯이, 같은 감성은 같은 자리에 놓입니다.<br>그래서 이 방법은 문화 데이터에도 그대로 쓸 수 있습니다. 마지막 질문으로 넘어가겠습니다.</aside>
+</section>
+<section id="culture" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">Q3 · 문화 데이터에는 어떻게 적용할 수 있는가</p>
+<h2>문화 데이터에서도 같은 차이를 놓칠 수 있다</h2>
+<div class="cols" style="align-items:flex-start;">
+<div class="diagram" style="width:520px; height:520px;">
+<svg aria-label="감성의 두 축 그림. 앞에서 본 단어들이 회색 점으로 남아 있고, 그 위에 리뷰 네 건이 번호로 찍혀 있다. 1번은 긍정·차분, 2번은 긍정·고조, 3번은 부정·차분, 4번은 부정·고조 자리다" viewBox="0 0 560 560" width="520" height="520">
+<rect x="40" y="40" width="240" height="240" fill="#FBD5C2" opacity="0.55"/>
+<rect x="280" y="40" width="240" height="240" fill="#F9E3B3" opacity="0.55"/>
+<rect x="40" y="280" width="240" height="240" fill="#DDE3EE" opacity="0.6"/>
+<rect x="280" y="280" width="240" height="240" fill="#D4E6EF" opacity="0.6"/>
+<line x1="280" y1="24" x2="280" y2="536" stroke="#B5B9C6" stroke-width="2"/>
+<line x1="24" y1="280" x2="536" y2="280" stroke="#B5B9C6" stroke-width="2"/>
+<g fill="#9AA0B8">
+<circle cx="453" cy="360" r="8"/><circle cx="174" cy="288" r="8"/><circle cx="393" cy="480" r="8"/><circle cx="319" cy="184" r="8"/><circle cx="186" cy="249" r="8"/>
+</g>
+<circle cx="372" cy="430" r="24" fill="#1B1F3B"/>
+<circle cx="420" cy="130" r="24" fill="#1B1F3B"/>
+<circle cx="143" cy="409" r="24" fill="#1B1F3B"/>
+<circle cx="150" cy="120" r="24" fill="#1B1F3B"/>
+</svg>
+<p class="lab" style="left:167px; top:0px; width:186px;">고조</p>
+<p class="lab" style="left:167px; top:486px; width:186px;">차분</p>
+<p class="lab" style="left:0px; top:216px; width:56px;">부정</p>
+<p class="lab" style="left:462px; top:232px; width:58px;">긍정</p>
+<p class="lab-soft" style="left:385px; top:286px; width:72px; color:#8A8FA3;">좋다</p>
+<p class="lab-soft" style="left:66px; top:270px; width:90px; color:#8A8FA3;">나쁘다</p>
+<p class="lab-soft" style="left:306px; top:154px; width:130px; color:#8A8FA3;">자극적이다</p>
+<p class="lab-soft" style="left:374px; top:429px; width:96px; color:#8A8FA3;">잔잔하다</p>
+<p class="lab-soft" style="left:88px; top:214px; width:75px; color:#8A8FA3;">욕설</p>
+<p class="lab" style="left:325px; top:382px; width:40px; color:#FDFCF9;">1</p>
+<p class="lab" style="left:370px; top:104px; width:40px; color:#FDFCF9;">2</p>
+<p class="lab" style="left:113px; top:362px; width:40px; color:#FDFCF9;">3</p>
+<p class="lab" style="left:119px; top:94px; width:40px; color:#FDFCF9;">4</p>
+<p class="lab" style="left:262px; top:341px; width:166px;">“위로받았다”</p>
+<p class="lab" style="left:320px; top:62px; width:140px;">“미쳤다”</p>
+<p class="lab" style="left:30px; top:408px; width:206px;">“그냥 그랬다”</p>
+<p class="lab" style="left:44px; top:136px; width:190px;">“환불해 달라”</p>
+</div>
+<div class="col" style="gap:10px;">
+<p class="small">문화 데이터: 영화·드라마·노래·출판·캐릭터·음식·웹툰·뷰티에 대한 리뷰와 텍스트</p>
+<div style="display:flex; gap:20px; align-items:flex-end;"><p class="small" style="flex:1;"></p><p class="small" style="width:130px; text-align:center; font-weight:700; color:#1B1F3B;">별점</p><p class="small" style="width:150px; text-align:center; font-weight:700; color:#B04E1A;">감성 지표</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">1</p><p style="flex:1;"><b>영화</b> · 잔잔하게 <b>위로받았다</b></p><p class="tag" style="width:130px; text-align:center;">★★★★★</p><p class="tag tag-cool" style="width:150px; text-align:center;">긍정 · 차분</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">2</p><p style="flex:1;"><b>웹툰</b> · <b>미쳤다</b>. 다음 화 빨리 줘</p><p class="tag" style="width:130px; text-align:center;">★★★★★</p><p class="tag" style="width:150px; text-align:center; background:#F9E3B3;">긍정 · 고조</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">3</p><p style="flex:1;"><b>음식</b> · 기대했는데 <b>그냥 그랬다</b></p><p class="tag" style="width:130px; text-align:center;">★</p><p class="tag" style="width:150px; text-align:center;">부정 · 차분</p></div>
+<div class="row" style="align-items:center; gap:20px;"><p class="badge">4</p><p style="flex:1;"><b>뷰티</b> · 피부가 뒤집어졌다. <b>환불해 달라</b></p><p class="tag" style="width:130px; text-align:center;">★</p><p class="tag tag-hot" style="width:150px; text-align:center;">부정 · 고조</p></div>
+<div class="callout" style="padding:16px 32px; gap:4px;">
+<p class="lead">별점은 1·2, 3·4가 같지만, 감성 지표로는 넷이 모두 다르다.</p>
+<p class="note">한국어 문화 콘텐츠 분석에는 긍정·부정 한 축만 쓴 사례가 많다. 네이버 영화 리뷰 데이터 [19], 드라마 반응 분석 [20], 웹툰 성공 예측 [21]이 그렇다.</p>
+</div>
+</div>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>문화 데이터에는 어떻게 적용할 수 있을까요?<br>여기서 문화 데이터는 영화, 드라마, 노래, 출판, 캐릭터, 음식, 웹툰, 뷰티에 대한 리뷰와 텍스트를 말합니다.<br><br>오른쪽에 리뷰 네 건이 있습니다. 1번과 2번은 둘 다 별 다섯 개, 3번과 4번은 둘 다 별 하나입니다.<br>별점으로는 같지만, 감성 좌표에 올려 보면 네 리뷰가 모두 다른 자리에 놓입니다.<br>1번은 차분한 만족이고 2번은 들뜬 열광입니다. 3번은 미지근한 실망이고 4번은 화가 난 항의입니다.<br><br>앞에서 벡터 유사도가 감성을 놓쳤듯이, 별점이나 긍정·부정 분석만으로는 고조와 차분의 차이를 놓칠 수 있습니다.</aside>
+</section>
+<section id="cases-arousal" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">Q3 · 근거 1 · 감성 지표를 재면</p>
+<h2>감성의 흐름은 작품의 흥행과 관련이 있었다</h2>
+<div class="cols" style="align-items:flex-start; gap:56px;">
+<div style="width:520px; flex:none; display:flex; flex-direction:column; gap:12px;">
+<p class="small">감성 흐름의 여섯 유형 · 위가 긍정 [23]</p>
+<svg role="img" aria-label="감성 흐름 여섯 유형의 개념도. 상승, 하강, 추락 후 회복, 상승 후 추락, 상승·추락·상승, 추락·상승·추락. 추락 후 회복이 주황색으로 강조되어 있다" viewBox="0 0 520 370" width="520" height="370">
+<g transform="translate(0 0)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 105 C60 100 100 30 145 25" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">상승</text></g><g transform="translate(180 0)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 25 C60 30 100 100 145 105" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">하강</text></g><g transform="translate(360 0)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FBE9DE" stroke="#D9672E" stroke-width="3"/><line x1="12" y1="65" x2="148" y2="65" stroke="#D9B8A3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 30 C50 30 60 105 80 105 C100 105 110 30 145 28" fill="none" stroke="#D9672E" stroke-width="7" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="700" fill="#B04E1A" text-anchor="middle">추락 후 회복</text></g><g transform="translate(0 190)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 102 C50 102 60 25 80 25 C100 25 110 100 145 102" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">상승 후 추락</text></g><g transform="translate(180 190)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 98 C35 98 40 40 60 40 C75 40 80 85 95 85 C110 85 120 30 145 25" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">상승·추락·상승</text></g><g transform="translate(360 190)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 30 C35 30 40 90 60 90 C75 90 80 45 95 45 C110 45 120 100 145 105" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">추락·상승·추락</text></g>
+</svg>
+</div>
+<div class="col" style="gap:0;">
+<div class="row"><p class="domain" style="width:170px; font-size:30px;">소설</p><p class="note" style="flex:1;">공개 소설 <b>1,327편</b>의 감성 흐름이 여섯 유형으로 나뉘었고, 유형에 따라 다운로드 수가 달랐다. <span class="small">레이건 외(Reagan et al.) 논문에서 · 2016 [23]</span></p></div>
+<div class="row"><p class="domain" style="width:170px; font-size:30px;">영화 대본</p><p class="note" style="flex:1;">대본 <b>6,174편</b>에서도 같은 여섯 유형이 나왔다. <b>추락 후 회복</b> 유형이 장르와 제작비에 관계없이 흥행이 가장 좋았다. <span class="small">델 베키오 외(Del Vecchio et al.) 논문에서 · 2021 [22]</span></p></div>
+<div class="row"><p class="domain" style="width:170px; font-size:30px;">노래 가사</p><p class="note" style="flex:1;">빌보드 50년 치 가사 <b>4,913곡</b>. 부정 감정어는 늘고 긍정 감정어는 줄었다. <span class="small">브랜드 외(Brand et al.) 논문에서 · 2019 [24]</span></p></div>
+</div>
+</div>
+<div class="grow"></div>
+<div class="callout"><p class="lead">작품의 감성 흐름을 재자, 흥행과 관련된 패턴이 보였다.</p><p class="note" style="color:#6e7389">세 연구 모두 텍스트만으로 분석했고, 주로 긍정·부정 축의 흐름을 쟀다.</p></div>
+<div class="foot"><div class="pg"></div></div>
+<aside>그러면 감성 지표를 실제로 쟀던 연구에서는 무엇이 보였을까요?<br>왼쪽 그림은 작품의 텍스트를 앞에서부터 구간별로 나눠 감성 점수를 매기고, 그 점수를 이은 모양을 여섯 유형으로 나눈 것입니다.<br>소설 1,327편을 분석한 연구에서 이 여섯 유형이 나왔고, 유형에 따라 다운로드 수가 달랐습니다.<br><br>영화 대본 6,174편에서도 같은 여섯 유형이 나왔고, 그중 주황색으로 표시한 추락 후 회복 유형이 장르와 제작비에 관계없이 흥행이 가장 좋았습니다.<br>노래 가사 연구에서는 50년 동안 부정적인 감정어가 늘고 긍정적인 감정어가 줄었습니다.<br><br>다만 이 연구들은 감성만 따로 본 것입니다. 벡터 유사도와 함께 쓰면 어떨까요?</aside>
+</section>
+<section id="cases-both" data-transition="fade" style="gap:16px;">
+<p class="eyebrow">Q3 · 근거 2 · 두 지표를 함께 쓰면</p>
+<h2>벡터 유사도와 감성 지표를 함께 쓴 연구가 더 나았다</h2>
+<div class="cards" style="gap:28px;">
+<div class="card" style="padding:18px 28px; gap:6px;">
+<h3>벡터 유사도만</h3>
+<div style="display:flex; gap:14px; align-items:center;"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px;">1</p><p class="note" style="flex:1;">힐링 되고 … <b>좋았다</b></p></div>
+<div style="display:flex; gap:14px; align-items:center;"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px;">2</p><p class="note" style="flex:1;">힐링 영화라더니 <b>자극적이었다</b></p></div>
+<div style="display:flex; gap:14px; align-items:center;"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px;">3</p><p class="note" style="flex:1;">힐링은커녕 <b>지루하고 졸렸다</b></p></div>
+<p class="tag tag-hot" style="align-self:flex-start;">감성이 반대인 리뷰가 섞인다</p>
+</div>
+<div class="card" style="padding:18px 28px; gap:6px;">
+<h3>감성 지표만</h3>
+<div style="display:flex; gap:14px; align-items:center;"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px;">1</p><p class="note" style="flex:1;">힐링 되고 … <b>좋았다</b></p></div>
+<div style="display:flex; gap:14px; align-items:center;"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#B5B9C6;">?</p><p class="note" style="flex:1;">식당이 조용해서 <b>좋았다</b></p></div>
+<div style="display:flex; gap:14px; align-items:center;"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#B5B9C6;">?</p><p class="note" style="flex:1;">배송이 빨라서 <b>만족했다</b></p></div>
+<p class="tag tag-hot" style="align-self:flex-start;">주제가 다른 리뷰가 섞인다</p>
+</div>
+<div class="card" style="padding:18px 28px; gap:6px; background:#FBE9DE; border:3px solid #D9672E; justify-content:space-between;">
+<h3>둘을 함께</h3>
+<div style="display:flex; gap:14px; align-items:center;"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px;">1</p><p class="note" style="flex:1;">힐링 되고 … <b>좋았다</b></p></div>
+<p class="tag tag-cool" style="align-self:flex-start;">원하던 결과만 남는다</p>
+</div>
+</div>
+<div style="display:flex; flex-direction:column; gap:0;">
+<div class="row" style="padding-top:8px; align-items:center; gap:20px;"><p class="domain" style="width:190px; font-size:28px;">블로그 검색</p><p class="note" style="flex:1;">주제 관련도와 의견 점수를 <b>합친 순위가 더 좋았다.</b> 의견 점수만 쓰면 오히려 나빠졌다. <span class="small">TREC 블로그 트랙에서 · 2006~2008 [25]</span></p></div>
+<div class="row" style="padding-top:8px; align-items:center; gap:20px;"><p class="domain" style="width:190px; font-size:28px;">영화 리뷰</p><p class="note" style="flex:1;">임베딩을 감성사전으로 보정하자 감성 분류가 <b>기존 임베딩보다 좋아졌다.</b> <span class="small">유 외(Yu et al.) 논문에서 · 2017 [13]</span></p></div>
+<div class="row" style="padding-top:8px; align-items:center; gap:20px;"><p class="domain" style="width:190px; font-size:28px;">영화 리뷰</p><p class="note" style="flex:1;">임베딩에 긍정·부정, 고조·차분 값을 결합하자 <b>세부 감정 탐지가 좋아졌다.</b> <span class="small">창 외(Chang et al.) 논문에서 · 2019 [26]</span></p></div>
+<div class="row" style="padding-top:8px; align-items:center; gap:20px;"><p class="domain" style="width:190px; font-size:28px;">뉴스 추천</p><p class="note" style="flex:1;">반대로 감성 유사도<b>만으로</b> 추천하자 클릭률이 <b>낮아졌다.</b> <span class="small">뉴스 추천 연구 논문에서 · 2018 [27]</span></p></div>
+</div>
+<div class="grow"></div>
+<div class="callout" style="padding:14px 32px;"><p class="lead">한쪽만 쓰면 주제나 감성 중 하나를 놓친다. 둘을 함께 쓸 때 결과가 나아졌다.</p></div>
+<div class="foot"><div class="pg"></div></div>
+<aside>두 번째 질문의 결론은 벡터 유사도와 감성 지표를 함께 보자는 것이었습니다. 실제로 함께 쓴 연구들을 보겠습니다.<br><br>위의 세 칸은 앞에서 본 힐링 예시입니다.<br>벡터 유사도만 쓰면 감성이 반대인 리뷰가 섞이고, 감성 지표만 쓰면 주제가 다른 리뷰가 섞입니다. 둘을 함께 써야 원하던 1번만 남습니다.<br><br>아래는 실제 연구입니다. 블로그 검색에서는 주제 관련도와 의견 점수를 합친 순위가 한쪽만 쓴 것보다 좋았습니다.<br>영화 리뷰에서는 임베딩에 감성 값을 더하자 감성 분류와 감정 탐지가 좋아졌습니다.<br>반대로 뉴스 추천에서 감성 유사도만 썼을 때는 클릭률이 낮아졌습니다.<br><br>정리하면, 한쪽만 쓰면 주제나 감성 중 하나를 놓치고, 둘을 함께 쓸 때 결과가 나아졌습니다.</aside>
+</section>
+<section id="method" data-transition="fade" style="gap:24px;">
+<p class="eyebrow">Q3 · 적용 방법</p>
+<h2>벡터 유사도로 찾고, 감성 지표로 고른다</h2>
+<div class="cols" style="align-items:flex-start; gap:48px;">
+<div class="col" style="gap:8px;">
+<h3>저장할 때</h3>
+<p class="small">리뷰마다 임베딩 벡터와 감성 지표를 함께 저장한다. 감성 지표는 LLM이 두 값을 매겨 메타데이터로 붙인다.</p>
+<div style="display:flex; gap:14px; align-items:flex-end; padding-top:6px;"><p class="small" style="flex:1;">리뷰</p><p class="small" style="box-sizing:border-box; width:110px; text-align:center; font-weight:700; color:#1B1F3B;">벡터</p><p class="small" style="box-sizing:border-box; width:170px; text-align:center; font-weight:700; color:#B04E1A;">감성 지표</p></div>
+<div class="row" style="align-items:center; gap:14px; padding-top:12px;"><p class="badge">1</p><p class="note" style="flex:1;">… 편안해져서 <b>좋았다</b></p><p class="tag" style="box-sizing:border-box; width:110px; text-align:center; background:#1B1F3B; color:#F7F5F0;">임베딩</p><p class="tag tag-cool" style="box-sizing:border-box; width:170px; text-align:center;">긍정 · 차분</p></div>
+<div class="row" style="align-items:center; gap:14px; padding-top:12px;"><p class="badge">2</p><p class="note" style="flex:1;">… 너무 <b>자극적이었다</b></p><p class="tag" style="box-sizing:border-box; width:110px; text-align:center; background:#1B1F3B; color:#F7F5F0;">임베딩</p><p class="tag tag-hot" style="box-sizing:border-box; width:170px; text-align:center;">부정 · 고조</p></div>
+<div class="row" style="align-items:center; gap:14px; padding-top:12px;"><p class="badge">3</p><p class="note" style="flex:1;">… <b>지루하고 졸렸다</b></p><p class="tag" style="box-sizing:border-box; width:110px; text-align:center; background:#1B1F3B; color:#F7F5F0;">임베딩</p><p class="tag" style="box-sizing:border-box; width:170px; text-align:center;">부정 · 차분</p></div>
+</div>
+<div class="col" style="gap:10px;">
+<h3>검색할 때</h3>
+<div class="flowbox"><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#D9672E;">Q</p><p class="clip" style="flex:1; font-size:28px;">“힐링하고 싶다”</p></div>
+<svg aria-hidden="true" width="28" height="26" viewBox="0 0 28 26" style="align-self:center;"><path d="M9 0 H19 V12 H27 L14 26 L1 12 H9 Z" fill="#C9C4B6"/></svg>
+<div class="flowbox flow-strong"><p class="rank">1단계</p><p style="flex:1;">벡터 유사도로 찾는다</p><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#F7F5F0; color:#1B1F3B;">1</p><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#F7F5F0; color:#1B1F3B;">2</p><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#F7F5F0; color:#1B1F3B;">3</p></div>
+<div class="flowbox flow-pick"><p class="rank">2단계</p><p style="flex:1;">감성 지표로 고른다 · <b>긍정 · 차분</b></p><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px;">1</p><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#E6D5CA; color:#B9A698;">2</p><p class="badge" style="width:40px; height:40px; line-height:40px; font-size:22px; background:#E6D5CA; color:#B9A698;">3</p></div>
+<p class="small">거르는 대신 두 점수를 합쳐 순위를 다시 매길 수도 있다. 16장의 블로그 검색이 그 예다.</p>
+</div>
+</div>
+<div class="grow"></div>
+<div class="callout">
+<p class="lead">감성 지표를 메타데이터로 붙여 두면, 검색·추천·분석에서 조건으로 쓸 수 있다.</p>
+<p class="note"><span style="color:#6e7389">남은 과제. LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지는 한국어 문화 콘텐츠에서 아직 검증이 부족하다. 검증 데이터가 먼저 필요하다.</span></p>
+</div>
+<div class="foot"><div class="pg"></div></div>
+<aside>그러면 어떻게 적용할 수 있을까요? 방법은 두 단계입니다.<br><br>먼저 저장할 때, 리뷰마다 임베딩 벡터와 감성 지표를 함께 저장합니다.<br>감성 지표는 LLM에게 긍정·부정과 고조·차분, 두 값을 매기게 해서 메타데이터로 붙일 수 있습니다.<br><br>검색할 때는 "힐링하고 싶다"는 질의가 들어오면, 1단계에서 벡터 유사도로 후보를 찾습니다. 세 리뷰가 모두 올라옵니다.<br>2단계에서 감성 지표로 고릅니다. 긍정이고 차분한 1번만 남습니다.<br>거르는 대신, 앞의 블로그 검색처럼 두 점수를 합쳐 순위를 다시 매길 수도 있습니다.<br><br>다만 과제가 있습니다. LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지, 한국어 문화 콘텐츠에서는 아직 검증이 부족합니다.</aside>
+</section>
+<section id="cases-applied" data-transition="fade" style="gap:12px;">
+<p class="eyebrow">Q3 · 분야별 적용</p>
+<h2>문화 데이터의 분야마다 이렇게 쓸 수 있다</h2>
+<div style="display:flex; gap:20px; align-items:flex-end;">
+<p class="small" style="width:340px;">분야와 근거 연구</p>
+<p class="small" style="flex:1; font-weight:700; color:#1B1F3B;">1단계 · 벡터 유사도로 찾는다</p>
+<p class="small" style="flex:1; font-weight:700; color:#B04E1A;">2단계 · 감성 지표로 고르거나 비교한다</p>
+</div>
+<div style="display:flex; gap:20px; align-items:center;">
+<div style="width:340px; display:flex; flex-direction:column; gap:2px;"><h3>영화·드라마 추천</h3><p class="small">드라마 추천 연구 · 2024 [28]</p></div>
+<div class="flowbox flow-strong" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;">“힐링하고 싶다”에 맞는 작품을 찾는다</p></div>
+<div class="flowbox flow-pick" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;"><b>긍정 · 차분</b> 리뷰가 많은 작품을 고른다</p></div>
+</div>
+<div style="display:flex; gap:20px; align-items:center;">
+<div style="width:340px; display:flex; flex-direction:column; gap:2px;"><h3>노래 추천</h3><p class="small">가사 4,913곡 분석 · 2019 [24]</p></div>
+<div class="flowbox flow-strong" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;">가사와 주제가 비슷한 곡을 찾는다</p></div>
+<div class="flowbox flow-pick" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;">지금 <b>기분과 같은 자리</b>의 곡을 고른다</p></div>
+</div>
+<div style="display:flex; gap:20px; align-items:center;">
+<div style="width:340px; display:flex; flex-direction:column; gap:2px;"><h3>영화·출판 기획</h3><p class="small">대본 6,174편 분석 · 2021 [22]</p></div>
+<div class="flowbox flow-strong" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;">소재가 비슷한 흥행작을 찾는다</p></div>
+<div class="flowbox flow-pick" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;"><b>감성 흐름</b>을 비교해 대본을 점검한다</p></div>
+</div>
+<div style="display:flex; gap:20px; align-items:center;">
+<div style="width:340px; display:flex; flex-direction:column; gap:2px;"><h3>웹툰 반응 추적</h3><p class="small">댓글 기반 성공 예측 연구 [21]</p></div>
+<div class="flowbox flow-strong" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;">회차별 댓글을 주제별로 모은다</p></div>
+<div class="flowbox flow-pick" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;"><b>반응이 식는 회차</b>를 감성 지표로 찾는다</p></div>
+</div>
+<div style="display:flex; gap:20px; align-items:center;">
+<div style="width:340px; display:flex; flex-direction:column; gap:2px;"><h3>뷰티·음식 리뷰 대응</h3><p class="small">리뷰 유용성 연구 · 2024 [29]</p></div>
+<div class="flowbox flow-strong" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;">같은 제품과 매장의 리뷰를 모은다</p></div>
+<div class="flowbox flow-pick" style="flex:1; padding-top:8px; padding-bottom:8px;"><p style="font-size:28px;"><b>부정 · 고조</b> 리뷰를 먼저 띄워 대응한다</p></div>
+</div>
+<div class="grow"></div>
+<div class="callout" style="padding:12px 32px; gap:2px;"><p class="lead">분야는 달라도 방법은 같다. 벡터 유사도로 찾고, 감성 지표로 고른다.</p><p class="note">두 상자는 모두 제안이다. 효과는 아직 검증이 필요하고, 그래서 연구 주제가 될 수 있다.</p></div>
+<div class="foot"><div class="pg"></div></div>
+<aside>이 두 단계를 분야별로 적용해 보면 이렇습니다.<br><br>영화와 드라마 추천에서는 "힐링하고 싶다"에 맞는 작품을 찾고, 긍정적이고 차분한 리뷰가 많은 작품을 고릅니다.<br>노래도 같습니다. 가사와 주제가 비슷한 곡을 찾고, 지금 기분과 같은 자리에 있는 곡을 고릅니다.<br>기획에서는 소재가 비슷한 흥행작을 찾아 감성의 흐름을 비교합니다.<br>웹툰에서는 회차별 댓글에서 반응이 식는 회차를 찾고, 뷰티와 음식에서는 부정적이고 고조된 리뷰에 먼저 대응합니다.<br><br>분야는 달라도 방법은 같습니다. 벡터 유사도로 찾고, 감성 지표로 고릅니다.<br>다만 오른쪽 두 칸은 검증된 사례가 아니라 제안입니다. 분야 아래의 작은 글씨가 그 근거가 된 연구입니다.</aside>
+</section>
+<section id="closing" class="accent" data-transition="fade" style="gap:24px;">
+<p class="eyebrow" style="color:#2A1A10;">결론 · 세 가지 질문의 답</p>
+<h2>문화 데이터를 다룰 때도 감성 지표를 고려해야 한다</h2>
+<div style="display:flex; flex-direction:column; gap:0;">
+<div class="row" style="border-top:2px solid #2A1A10; align-items:center; padding-bottom:16px;"><p class="num">Q1</p><div style="flex:1; display:flex; flex-direction:column; gap:2px;"><p class="small">챗봇에게 욕을 하면 정말 더 잘 알아들을까</p><p class="lead" style="color:#1B1F3B;">아니다. 정답률에는 사실상 차이가 없었다.</p></div></div>
+<div class="row" style="border-top:2px solid #2A1A10; align-items:center; padding-bottom:16px;"><p class="num">Q2</p><div style="flex:1; display:flex; flex-direction:column; gap:2px;"><p class="small">감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p><p class="lead" style="color:#1B1F3B;">벡터 유사도에는 주제와 문맥이 크게, 감성은 덜 반영된다. 감성 지표로 보완한다.</p></div></div>
+<div class="row" style="border-top:2px solid #2A1A10; align-items:center; padding-bottom:16px;"><p class="num">Q3</p><div style="flex:1; display:flex; flex-direction:column; gap:2px;"><p class="small">문화 데이터에는 어떻게 적용할 수 있는가</p><p class="lead" style="color:#1B1F3B;">벡터 유사도로 찾고, 감성 지표로 고른다.</p></div></div>
+</div>
+<div class="grow"></div>
+<aside>오늘의 결론입니다. 문화 데이터를 다룰 때도 감성 지표를 고려해야 한다는 것입니다.<br><br>처음의 세 질문에 답해 보겠습니다.<br>챗봇에게 욕을 하면 더 잘 알아들을까? 아닙니다. 정답률에는 사실상 차이가 없었습니다. 오늘 부제의 질문에 대한 답이기도 합니다.<br>감성적 표현은 왜 덜 반영되고, 어떻게 보완할까? 벡터 유사도에는 주제와 문맥이 크게 반영되기 때문이고, 감성 지표를 함께 고려하면 보완할 수 있습니다.<br>문화 데이터에는 어떻게 적용할까? 벡터 유사도로 찾고, 감성 지표로 고릅니다.<br><br>남은 과제는 두 가지입니다. 한국어 문화 콘텐츠 리뷰에 감성 지표를 붙인 검증 데이터가 아직 드물고, LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지도 더 검증해야 합니다.<br>여러분의 연구 주제가 될 수 있다고 생각합니다.<br>들어 주셔서 감사합니다. 질문 받겠습니다.</aside>
+</section>
+<section id="refs" data-transition="fade" style="gap:10px;">
+<p class="eyebrow">참고문헌</p>
+<h2 style="font-size:44px;">질문별 인용 출처</h2>
+<div style="display:flex; flex-direction:column; gap:6px;">
+<p class="small" style="color:#B04E1A; font-size:20px;"><b>도입 · 기사와 발언 (3장, 4장의 번호)</b></p>
+<div style="display:grid; grid-template-columns:1fr 1fr; column-gap:40px; row-gap:4px;">
+<p class="small" style="font-size:20px;">[1] Fortune (2025.10.30). Being mean to ChatGPT can boost its accuracy.</p>
+<p class="small" style="font-size:20px;">[4] Sam Altman, X 답글 (2025.04). 보도: TechRadar, The Register.</p>
+<p class="small" style="font-size:20px;">[2] Decrypt (2025.10). Want better results from an AI chatbot? Be a jerk.</p>
+<p class="small" style="font-size:20px;">[5] Future plc 설문 (2024.12 조사, 2025.02 보도). TechRadar.</p>
+<p class="small" style="font-size:20px;">[3] Sergey Brin, All-In Live from Miami (2025.05). 보도: The Register.</p>
+<p class="small" style="font-size:20px;">[6] Yin et al. (2024). Should we respect LLMs? <i>SICon</i>. arXiv:2402.14531.</p>
+</div>
+</div>
+<div class="cols" style="gap:40px;">
+<div class="col" style="flex:1; gap:4px;">
+<p class="small" style="color:#B04E1A; font-size:20px;"><b>Q1 · 욕과 프롬프트의 톤 (7장, 8장의 번호 · [6]은 위)</b></p>
+<p class="small" style="font-size:20px;">[7] Li et al. (2023). LLMs understand and can be enhanced by emotional stimuli. arXiv:2307.11760.</p>
+<p class="small" style="font-size:20px;">[8] Dobariya &amp; Kumar (2025). Mind your tone. arXiv:2510.04950.</p>
+<p class="small" style="font-size:20px;">[9] Cai, Shen, Jin, Hu &amp; Fan (2025). Does tone change the answer? arXiv:2512.12812.</p>
+<p class="small" style="font-size:20px;">[10] Vaugrante, Niepert &amp; Hagendorff (2024). A looming replication crisis in evaluating behavior in language models? arXiv:2409.20303.</p>
+<p class="small" style="font-size:20px;">[11] Dobariya &amp; Kumar (2026). Mind your tone: Does tone alter LLM performance? arXiv:2605.29027.</p>
+<p class="small" style="font-size:20px;">[30] Grice (1957). Meaning. <i>Philos. Rev.</i> 66(3). · [31] Austin (1962). <i>How to Do Things with Words</i>.</p>
+</div>
+<div class="col" style="flex:1; gap:4px;">
+<p class="small" style="color:#B04E1A; font-size:20px;"><b>Q2 · 벡터 공간과 감성 지표 (8~13장의 번호)</b></p>
+<p class="small" style="font-size:20px;">[12] Tang et al. (2014). Learning sentiment-specific word embedding for Twitter sentiment classification. <i>ACL</i>.</p>
+<p class="small" style="font-size:20px;">[13] Yu, Wang, Lai &amp; Zhang (2017). Refining word embeddings for sentiment analysis. <i>EMNLP</i>.</p>
+<p class="small" style="font-size:20px;">[14] Russell (1980). A circumplex model of affect. <i>JPSP</i>.</p>
+<p class="small" style="font-size:20px;">[15] Warriner, Kuperman &amp; Brysbaert (2013). Norms of valence, arousal, and dominance. <i>Behav. Res. Methods</i>.</p>
+<p class="small" style="font-size:20px;">[16] Emotions where art thou (2025). arXiv:2510.22042. · [17] Sun et al. (2026). Valence-arousal subspace in LLMs. arXiv:2604.03147.</p>
+<p class="small" style="font-size:20px;">[18] Sofroniew et al. (2026). Emotion concepts and their function in an LLM. arXiv:2604.07729.</p>
+</div>
+<div class="col" style="flex:1.35; gap:4px;">
+<p class="small" style="color:#B04E1A; font-size:20px;"><b>Q3 · 문화 데이터 (14~18장의 번호)</b></p>
+<p class="small" style="font-size:20px;">[19] Park (2015). NSMC: Naver sentiment movie corpus.</p>
+<p class="small" style="font-size:20px;">[20] 웹툰 원작 TV 드라마의 관객 감정 분석. <i>디지털콘텐츠학회논문지</i> (2023).</p>
+<p class="small" style="font-size:20px;">[21] 웹툰 데뷔작 성공 예측 모델. [서지 확인]</p>
+<p class="small" style="font-size:20px;">[22] Del Vecchio et al. (2021). Using emotional arcs of movies to drive product and service innovation. <i>J. Oper. Res. Soc.</i> 72(5).</p>
+<p class="small" style="font-size:20px;">[23] Reagan et al. (2016). The emotional arcs of stories are dominated by six basic shapes. <i>EPJ Data Sci.</i></p>
+<p class="small" style="font-size:20px;">[24] Brand, Acerbi &amp; Mesoudi (2019). Cultural evolution of emotional expression in 50 years of song lyrics. <i>Evol. Hum. Sci.</i></p>
+<p class="small" style="font-size:20px;">[25] TREC Blog Track (2006~2008). · [26] Chang, Yeh, Hsing &amp; Wang (2019). <i>PLoS ONE</i> 14(10).</p>
+<p class="small" style="font-size:20px;">[27] 뉴스 추천 감성 연구 (2018). [확인]</p>
+<p class="small" style="font-size:20px;">[28] How You Like That?: K-drama recommendation. <i>ICEIC</i> (2024).</p>
+<p class="small" style="font-size:20px;">[29] 상품 리뷰의 감정과 유용성 연구 (2024). [확인]</p>
+</div>
+</div>
+<div class="foot"><p>Claude를 이용하여 조사한 인용이므로 확인 필요함</p><div class="pg"></div></div>
+<aside>참고문헌입니다. 발표 자료에 표시한 번호와 같은 번호로 정리했습니다.</aside>
+</section>
+</div></div>
+<div id="notes" aria-live="polite"><h4>발표 대본</h4><div id="notes-text"></div></div>
+<div id="bar">
+<button id="prev" aria-label="이전 슬라이드">‹ 이전</button>
+<span id="count">1 / 20</span>
+<button id="next" aria-label="다음 슬라이드">다음 ›</button>
+<span class="sp"></span>
+<span class="wide hint">← → 키로 넘기기 · N 대본</span>
+<button id="toggle" aria-pressed="false">대본 보기</button>
+<button id="full" class="wide">전체 화면</button>
+<a href="script.txt" class="wide">대본 txt</a>
+<a href="../#talks" class="wide">작업실</a>
+</div>
+<script>
+(function(){
+var S=[].slice.call(document.querySelectorAll('#stage > section')),n=S.length,i=0,list=false;
+S.forEach(function(s,j){var w=document.createElement('div');w.className='slot';s.parentNode.insertBefore(w,s);w.appendChild(s);
+var a=s.querySelector('aside');if(a){var d=document.createElement('details');d.className='mnote';d.innerHTML='<summary>'+(j+1)+'장 대본</summary><div>'+a.innerHTML+'</div>';w.parentNode.insertBefore(d,w.nextSibling);}});
+var stage=document.getElementById('stage'),vp=document.getElementById('viewport');
+function fit(){var narrow=innerWidth<=700||(innerWidth<innerHeight&&innerWidth<=900);
+if(narrow!==list){list=narrow;document.body.classList.toggle('list',list);}
+if(list){var s=(document.getElementById('stage').clientWidth)/1920;S.forEach(function(x){x.style.transform='scale('+s+')';x.parentNode.style.height=(1080*s)+'px';});return;}
+S.forEach(function(x){x.style.transform='';x.parentNode.style.height='';});
+var r=vp.getBoundingClientRect();stage.style.transform='scale('+Math.min(r.width/1920,r.height/1080)+')';}
+function go(k,push){i=Math.max(0,Math.min(n-1,k));S.forEach(function(s,j){s.classList.toggle('on',j===i);s.setAttribute('aria-hidden',j===i?'false':'true');});
+document.getElementById('count').textContent=(i+1)+' / '+n;
+var a=S[i].querySelector('aside');document.getElementById('notes-text').innerHTML=a?a.innerHTML:'';
+if(push!==false)history.replaceState(null,'','#'+(i+1));}
+function toggle(){var on=document.body.classList.toggle('notes');document.getElementById('toggle').setAttribute('aria-pressed',on);document.getElementById('toggle').textContent=on?'대본 닫기':'대본 보기';fit();}
+document.getElementById('prev').onclick=function(){go(i-1);};
+document.getElementById('next').onclick=function(){go(i+1);};
+document.getElementById('toggle').onclick=toggle;
+document.getElementById('full').onclick=function(){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();};
+document.addEventListener('keydown',function(e){if(list)return;if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
+if(['ArrowRight','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();go(i+1);}
+else if(['ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();go(i-1);}
+else if(e.key==='Home')go(0);else if(e.key==='End')go(n-1);
+else if(e.key==='n'||e.key==='N'||e.key==='ㅜ')toggle();
+else if(e.key==='f'||e.key==='F')document.getElementById('full').click();});
+vp.addEventListener('click',function(e){if(list)return;var r=vp.getBoundingClientRect();go(e.clientX<r.left+r.width/3?i-1:i+1);});
+var x0=null;vp.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
+vp.addEventListener('touchend',function(e){if(list||x0===null)return;var d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)go(d<0?i+1:i-1);x0=null;});
+window.addEventListener('resize',fit);
+window.addEventListener('hashchange',function(){var k=parseInt(location.hash.slice(1),10);if(!isNaN(k)&&k-1!==i)go(k-1,false);});
+var h=parseInt(location.hash.slice(1),10);go(isNaN(h)?0:h-1,false);fit();
+if(list&&!isNaN(h)&&S[h-1])S[h-1].parentNode.scrollIntoView();
+})();
+</script>
+</body>
+</html>
