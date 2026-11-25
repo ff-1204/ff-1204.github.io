@@ -707,34 +707,34 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <div class="row" style="align-items:center; gap:20px;"><p class="badge">3</p><p style="flex:1;"><b>음식</b> · 기대했는데 <b>그냥 그랬다</b></p><p class="tag" style="width:130px; text-align:center;">★</p><p class="tag" style="width:150px; text-align:center;">부정 · 차분</p></div>
 <div class="row" style="align-items:center; gap:20px;"><p class="badge">4</p><p style="flex:1;"><b>뷰티</b> · 피부가 뒤집어졌다. <b>환불해 달라</b></p><p class="tag" style="width:130px; text-align:center;">★</p><p class="tag tag-hot" style="width:150px; text-align:center;">부정 · 고조</p></div>
 <div class="callout" style="padding:16px 32px; gap:4px;">
-<p class="lead">별점은 1·2, 3·4가 같지만, 감성 지표로는 넷이 모두 다르다.</p>
-<p class="note">한국어 문화 콘텐츠 분석에는 긍정·부정 한 축만 쓴 사례가 많다. 네이버 영화 리뷰 데이터 [19], 드라마 반응 분석 [20], 웹툰 성공 예측 [21]이 그렇다.</p>
+<p class="lead">별점이 같은 리뷰도, 감성 지표로 보면 서로 다르다.</p>
+<p class="note">1번과 2번은 둘 다 별 다섯 개, 3번과 4번은 둘 다 별 하나다. 고조·차분까지 보면 넷이 모두 갈린다.</p>
+<p class="note" style="color:#6e7389">지금까지의 한국어 문화 콘텐츠 분석도 별점처럼 긍정·부정만 본 경우가 많다 [19][20][21].</p>
 </div>
 </div>
 </div>
 <div class="foot"><div class="pg"></div></div>
 <aside>문화 데이터에는 어떻게 적용할 수 있을까요?<br>오늘 말씀드리는 문화 데이터는 영화, 드라마, 노래, 출판, 캐릭터, 음식, 웹툰, 뷰티에 대한 리뷰와 텍스트입니다.<br><br>오른쪽에 리뷰 네 개가 있습니다. 1번과 2번은 둘 다 별 다섯 개, 3번과 4번은 둘 다 별 하나입니다.<br>별점으로는 똑같은데요, 감성 좌표에 올려 보면 네 개가 전부 다른 자리에 놓입니다.<br>1번은 차분한 만족이고, 2번은 들뜬 열광입니다. 3번은 미지근한 실망이고, 4번은 화가 난 항의죠.<br><br>앞에서 벡터 유사도가 감성을 놓쳤던 것처럼, 별점이나 긍정·부정 분석만으로는 고조와 차분의 차이를 놓칠 수 있습니다.</aside>
 </section>
-<section id="cases-arousal" data-transition="fade" style="gap:24px;">
+<section id="cases-arousal" data-transition="fade" style="gap:16px;">
 <p class="eyebrow">Q3 · 근거 1 · 감성 지표를 재면</p>
 <h2>감성의 흐름은 작품의 흥행과 관련이 있었다</h2>
 <div class="cols" style="align-items:flex-start; gap:56px;">
 <div style="width:520px; flex:none; display:flex; flex-direction:column; gap:12px;">
-<p class="small">감성 흐름의 여섯 유형 · 위가 긍정 [23]</p>
+<p class="small">감성 흐름: 작품의 글을 구간별로 나눠 감성 점수를 매기고 이은 선. 위가 긍정 [23]</p>
 <svg role="img" aria-label="감성 흐름 여섯 유형의 개념도. 상승, 하강, 추락 후 회복, 상승 후 추락, 상승·추락·상승, 추락·상승·추락. 추락 후 회복이 주황색으로 강조되어 있다" viewBox="0 0 520 370" width="520" height="370">
 <g transform="translate(0 0)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 105 C60 100 100 30 145 25" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">상승</text></g><g transform="translate(180 0)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 25 C60 30 100 100 145 105" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">하강</text></g><g transform="translate(360 0)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FBE9DE" stroke="#D9672E" stroke-width="3"/><line x1="12" y1="65" x2="148" y2="65" stroke="#D9B8A3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 30 C50 30 60 105 80 105 C100 105 110 30 145 28" fill="none" stroke="#D9672E" stroke-width="7" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="700" fill="#B04E1A" text-anchor="middle">추락 후 회복</text></g><g transform="translate(0 190)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 102 C50 102 60 25 80 25 C100 25 110 100 145 102" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">상승 후 추락</text></g><g transform="translate(180 190)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 98 C35 98 40 40 60 40 C75 40 80 85 95 85 C110 85 120 30 145 25" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">상승·추락·상승</text></g><g transform="translate(360 190)"><rect x="0" y="0" width="160" height="130" rx="12" fill="#FDFCF9" stroke="#E2DED3" stroke-width="2"/><line x1="12" y1="65" x2="148" y2="65" stroke="#E2DED3" stroke-width="2" stroke-dasharray="6 6"/><path d="M15 30 C35 30 40 90 60 90 C75 90 80 45 95 45 C110 45 120 100 145 105" fill="none" stroke="#8A8FA3" stroke-width="5" stroke-linecap="round"/><text x="80" y="166" font-size="22" font-weight="400" fill="#5A6072" text-anchor="middle">추락·상승·추락</text></g>
 </svg>
 </div>
 <div class="col" style="gap:0;">
-<div class="row"><p class="domain" style="width:170px; font-size:30px;">소설</p><p class="note" style="flex:1;">공개 소설 <b>1,327편</b>의 감성 흐름이 여섯 유형으로 나뉘었고, 유형에 따라 다운로드 수가 달랐다. <span class="small">레이건 외(Reagan et al.) 논문에서 · 2016 [23]</span></p></div>
-<div class="row"><p class="domain" style="width:170px; font-size:30px;">영화 대본</p><p class="note" style="flex:1;">대본 <b>6,174편</b>에서도 같은 여섯 유형이 나왔다. <b>추락 후 회복</b> 유형이 장르와 제작비에 관계없이 흥행이 가장 좋았다. <span class="small">델 베키오 외(Del Vecchio et al.) 논문에서 · 2021 [22]</span></p></div>
-<div class="row"><p class="domain" style="width:170px; font-size:30px;">노래 가사</p><p class="note" style="flex:1;">빌보드 50년 치 가사 <b>4,913곡</b>. 부정 감정어는 늘고 긍정 감정어는 줄었다. <span class="small">브랜드 외(Brand et al.) 논문에서 · 2019 [24]</span></p></div>
+<div class="row"><p class="domain" style="width:170px; font-size:30px;">소설</p><p class="note" style="flex:1;">공개 소설 <b>1,327편</b>의 감성 흐름이 <b>여섯 모양</b>으로 묶였고, 모양에 따라 <b>다운로드 수</b>가 달랐다. <span class="small">레이건 외(Reagan et al.) 논문에서 · 2016 [23]</span></p></div>
+<div class="row"><p class="domain" style="width:170px; font-size:30px;">영화 대본</p><p class="note" style="flex:1;">대본 <b>6,174편</b>에서도 같은 여섯 모양이 나왔다. <b>떨어졌다가 올라오는 모양</b>이 장르·제작비와 관계없이 가장 흥행했다. <span class="small">델 베키오 외(Del Vecchio et al.) 논문에서 · 2021 [22]</span></p></div>
 </div>
 </div>
 <div class="grow"></div>
-<div class="callout"><p class="lead">작품의 감성 흐름을 재자, 흥행과 관련된 패턴이 보였다.</p><p class="note" style="color:#6e7389">세 연구 모두 텍스트만으로 분석했고, 주로 긍정·부정 축의 흐름을 쟀다.</p></div>
+<div class="callout"><p class="lead">리뷰가 아니라 작품의 글에서도, 감성을 수치로 재자 인기와 이어지는 모양이 보였다.</p><p class="note" style="color:#6e7389">두 연구 모두 긍정·부정 축만 쟀다. 고조·차분까지 재면 더 볼 수 있다.</p></div>
 <div class="foot"><div class="pg"></div></div>
-<aside>그러면 감성 지표를 실제로 쟀던 연구에서는 뭐가 보였을까요?<br>왼쪽 그림은 작품의 텍스트를 앞에서부터 구간별로 나눠서 감성 점수를 매기고, 그 점수를 이은 모양을 여섯 가지 유형으로 나눈 겁니다.<br>소설 1,327편을 분석한 연구에서 이 여섯 유형이 나왔고요, 유형에 따라 다운로드 수가 달랐습니다.<br><br>영화 대본 6,174편에서도 같은 여섯 유형이 나왔습니다. 그중에서 주황색으로 표시한 추락 후 회복 유형이, 장르나 제작비와 상관없이 흥행이 가장 좋았습니다.<br>노래 가사 연구에서는 50년 동안 부정적인 감정어가 늘고 긍정적인 감정어가 줄었다고 합니다.<br><br>다만 이 연구들은 감성만 따로 본 겁니다. 그러면 벡터 유사도와 함께 쓰면 어떨까요?</aside>
+<aside>지금까지는 사람들이 쓴 리뷰를 봤는데요, 이번에는 작품 자체의 글을 보겠습니다. 감성을 수치로 쟀던 연구에서는 뭐가 보였을까요?<br>왼쪽 그림이 감성 흐름입니다. 소설이나 대본을 앞에서부터 구간별로 나눠서 감성 점수를 매기고, 그 점수를 선으로 이은 겁니다. 주인공이 위기에 빠지면 선이 내려가고, 해결되면 올라오는 식이죠.<br><br>소설 1,327편을 이렇게 분석했더니 선의 모양이 여섯 가지로 묶였고요, 모양에 따라 다운로드 수, 그러니까 인기가 달랐습니다.<br>영화 대본 6,174편에서도 같은 여섯 모양이 나왔습니다. 그중에서 주황색으로 표시한, 떨어졌다가 다시 올라오는 모양이 장르나 제작비와 상관없이 흥행이 가장 좋았습니다.<br><br>다만 이 연구들은 감성만 따로 본 겁니다. 그러면 벡터 유사도와 함께 쓰면 어떨까요?</aside>
 </section>
 <section id="cases-both" data-transition="fade" style="gap:16px;">
 <p class="eyebrow">Q3 · 근거 2 · 두 지표를 함께 쓰면</p>
