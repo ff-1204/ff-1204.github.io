@@ -14,7 +14,6 @@
 <style>
 html,body{margin:0;height:100%;background:#111318;overflow:hidden}
 #viewport{position:fixed;left:0;right:0;top:0;bottom:52px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-body.notes #viewport{bottom:calc(52px + 34vh)}
 #stage{position:relative;width:1920px;height:1080px;flex:none;transform-origin:center center;counter-reset:page}
 #stage *{margin:0;box-sizing:content-box}
 #stage h1{font-size:96px} #stage h2{font-size:64px} #stage h3{font-size:44px}
@@ -120,9 +119,12 @@ table { font-size: 26px; line-height: 1.4; color: #1B1F3B; }
 #count{min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
 #bar .sp{flex:1}
 #bar a{color:#F2A071}
-#notes{display:none;position:fixed;left:0;right:0;bottom:52px;height:34vh;overflow:auto;background:#F7F5F0;color:#1B1F3B;border-top:4px solid #D9672E;padding:16px max(16px,calc(50vw - 480px));box-sizing:border-box;font:18px/1.75 'Noto Sans KR',system-ui,sans-serif}
-body.notes #notes{display:block}
-#notes h4{margin:0 0 8px;font-size:14px;color:#B04E1A;letter-spacing:1px}
+/* 자막: 슬라이드 아래쪽에 대본을 한 문장씩 */
+#stage #cap{position:absolute;left:128px;right:128px;bottom:36px;z-index:5;display:flex;align-items:center;justify-content:center;gap:20px;min-height:76px;padding:14px 36px;box-sizing:border-box;border-radius:12px;background:rgba(17,19,24,.88);pointer-events:none}
+#stage #cap[hidden]{display:none}
+#stage #cap-text{margin:0;color:#fff;font:500 34px/1.4 'Noto Sans KR',sans-serif;text-align:center;text-wrap:balance}
+#stage #cap-n{flex:none;color:#9AA0B8;font:400 20px/1 'Noto Sans KR',sans-serif;font-variant-numeric:tabular-nums}
+body.list #stage #cap{display:none}
 /* 좁은 화면: 슬라이드를 세로로 이어 보기 */
 .slot{position:absolute;inset:0}
 .mnote{display:none}
@@ -138,7 +140,6 @@ body.list #prev,body.list #next,body.list #count,body.list #toggle,body.list #fu
 body.list #bar .wide{display:inline}
 body.list #bar .hint,body.list #bar #full{display:none}
 body.list #bar{justify-content:flex-end;gap:18px}
-body.list #notes{display:none!important}
 #mhead{display:none}
 body.list #mhead{display:block;color:#F7F5F0;font:700 17px/1.5 'Noto Serif KR',serif;padding:4px 2px 0}
 body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif;color:#9AA0B8}
@@ -157,7 +158,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 
 </div>
 </div>
-<aside>“LLM 기반 감성 지표를 활용한 문화 데이터 분석 및 활용 방안”,<br>부제 “챗봇에게 욕을 하면 왜 더 잘 알아들을까?”로 발표를 시작하겠습니다.</aside>
+<aside>안녕하세요. 오늘은 “LLM 기반 감성 지표를 활용한 문화 데이터 분석 및 활용 방안”이라는 주제로 발표하겠습니다.<br>부제는 “챗봇에게 욕을 하면 왜 더 잘 알아들을까?”인데요, 이 질문에서부터 이야기를 시작해 보겠습니다.</aside>
 </section>
 <section id="about" data-transition="fade" style="gap:16px;">
 <p class="eyebrow">발표자 소개</p>
@@ -173,7 +174,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <div class="grow"></div>
 <div class="callout" style="padding:14px 36px; gap:2px;"><p class="lead" style="font-style:normal;letter-spacing:0;text-transform:none;font-size:36px;font-weight:700;line-height:1.3">데이터 분석가로 시작해 AI 엔지니어가 되었습니다.</p><p class="note">다루는 데이터가 생체 신호에서 행동 기록, 시스템 지표, 텍스트로 넓어졌습니다.</p></div>
 <div class="foot" style="bottom:82px;left:50%;transform:translateX(-50%)"><p></p><div class="pg"></div></div>
-<aside>저는 대학원에서 감성공학을 전공하며 심박변이도로 사람의 감성을 측정했고, 이후 심박이나 뇌파 같은 시계열 데이터를 분석해 의료기기와 운동기기를 개발했습니다.<br>지금은 시스템 로그와 지표를 분석해 이상 탐지와 LLM 챗봇을 개발하는 AI 엔지니어로 일하고 있습니다.</aside>
+<aside>먼저 제 소개를 짧게 드리겠습니다.<br>저는 대학원에서 감성공학을 전공했고요, 심박변이도로 사람의 감성을 측정하는 연구를 했습니다.<br>졸업하고 나서는 심박이나 뇌파 같은 시계열 데이터를 분석해서 의료기기와 운동기기를 만들었습니다.<br><br>지금은 시스템 로그와 지표를 분석해서, 이상 탐지와 LLM 챗봇을 개발하는 AI 엔지니어로 일하고 있습니다.</aside>
 </section>
 <section id="ask" class="dark" data-transition="fade" style="gap:32px;">
 <p class="eyebrow">질문 하나 · “부정적인 말을 하면 잘 듣는다”</p>
@@ -249,7 +250,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>혹시 여러분은 제미나이나 클로드 같은 챗봇에게, 더 좋은 답변을 받으려고 욕을 해 본 적이 있으십니까?<br>저는 세 시간 동안 같은 문제로 씨름하다가 해 본 적이 있습니다.</aside>
+<aside>본론에 들어가기 전에 하나 여쭤보겠습니다.<br>혹시 여러분은 제미나이나 클로드 같은 챗봇한테, 답을 더 잘 받아 보려고 욕을 해 보신 적 있으신가요?<br><br>저는 있습니다. 같은 문제를 세 시간째 붙잡고 있다가, 결국 한 번 했습니다.</aside>
 </section>
 <section id="ask-polite" data-transition="fade" style="gap:32px;">
 <p class="eyebrow">질문 둘 · “긍정적인 말을 해야 한다”</p>
@@ -323,7 +324,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>그러면 반대로, AI를 하나의 인격체로 존중하면 더 좋은 답변을 줄 것이라고 생각하신 분은 없으신가요?</aside>
+<aside>그러면 반대인 분들도 계실 텐데요.<br>AI를 하나의 인격체처럼 존중해 주면 더 좋은 답을 줄 거다, 이렇게 생각하시는 분은 안 계신가요?</aside>
 </section>
 <section id="hook" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">문제 제기</p>
@@ -349,7 +350,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <p class="lead">같은 요청도 <span class="orange">어떤 감성적 표현을 사용하는지</span>에 따라 LLM의 결과가 달라진다고 한다. 정말 그럴까?</p>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>같은 요청을 공손하게 하느냐 거칠게 하느냐, 이렇게 감성적 표현만 다르다고 해서 결과가 달라질까요?<br><br>함께 알아보겠습니다.</aside>
+<aside>여기 두 요청을 보시면, 부탁하는 내용은 똑같습니다. 하나는 공손하게, 하나는 거칠게 말했을 뿐입니다.<br>이렇게 감성적 표현만 달라져도 정말 결과가 달라질까요?<br><br>오늘 이 질문을 같이 풀어 보겠습니다.</aside>
 </section>
 <section id="agenda" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">목차</p>
@@ -373,7 +374,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 <div class="grow"></div>
 <div class="foot"><div class="pg"></div></div>
-<aside>오늘 함께 알아볼 질문은 세 가지입니다.<br><br>챗봇에게 욕을 하면 정말 더 잘 알아들을까?<br>감성적 표현은 왜 덜 반영되고, 어떻게 보완할 수 있을까?<br>그리고 문화 데이터에는 어떻게 적용할 수 있을까?<br><br>하나씩 알아보겠습니다.</aside>
+<aside>오늘 같이 볼 질문은 세 가지입니다.<br><br>첫째, 챗봇에게 욕을 하면 정말 더 잘 알아들을까.<br>둘째, 감성적 표현은 왜 덜 반영되고, 그걸 어떻게 보완할 수 있을까.<br>셋째, 그러면 문화 데이터에는 어떻게 적용할 수 있을까.<br><br>이 순서대로 하나씩 말씀드리겠습니다.</aside>
 </section>
 <section id="tone-evidence" data-transition="fade" style="gap:20px;">
 <p class="eyebrow">Q1 · 확인</p>
@@ -407,7 +408,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <p class="note" style="color:#6e7389">가장 크게 보고된 차이가 4%p였고, 모델과 과제를 넓히자 그 차이도 대부분 유의하지 않았다.</p>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>결론부터 말씀드리면, 욕을 하든 공손하게 하든 정답률에는 사실상 차이가 없었습니다.<br><br>앞에서 본 "욕하면 정확도가 오른다"는 기사는 도바리야와 쿠마르의 첫 연구에서 나왔습니다. 매우 무례한 말투가 매우 공손한 말투보다 정답률이 4%p 높았습니다.<br>그런데 다른 연구진이 모델과 과제를 넓혀 다시 해 보니 대부분 유의미하지 않았고, 같은 저자가 다시 했을 때도 차이가 2.2%p로 줄었습니다.<br><br>이번 발표는 여기까지…<br>하고 싶지만, "왜 차이가 없을까?"를 이어서 설명하겠습니다.</aside>
+<aside>첫 번째 질문, 결론부터 말씀드리겠습니다. 욕을 하든 공손하게 하든, 정답률에는 사실상 차이가 없었습니다.<br><br>앞에서 보신 "욕하면 정확도가 오른다"는 기사는요, 도바리야와 쿠마르의 첫 연구에서 나온 겁니다. 왼쪽 그래프를 보시면, 매우 무례한 말투가 매우 공손한 말투보다 정답률이 4%p 높게 나왔습니다.<br>그런데 다른 연구진이 모델과 과제를 넓혀서 다시 해 보니까 대부분 유의미하지 않았고요, 같은 저자가 다시 했을 때도 차이가 2.2%p로 줄었습니다.<br><br>그러면 오늘 발표는 여기까지…<br>라고 하고 싶지만, "그럼 왜 차이가 없을까?"가 남았죠. 지금부터가 진짜 이야기입니다.</aside>
 </section>
 <section id="why-distribution" data-transition="fade" style="gap:12px;">
 <p class="eyebrow">Q1 · 확인</p>
@@ -434,7 +435,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <div class="grow"></div>
 <div class="callout" style="padding:18px 36px; gap:4px;"><p class="lead">벡터 유사도에는 문장의 의미가 크게 반영되고, 감성적 맥락은 덜 반영된다.</p><p class="src" style="color:#6e7389">탕 외(Tang et al.) 2014 [12] · 유 외(Yu et al.) 2017 [13] 연구 논문에서</p></div>
 <div class="foot"><div class="pg"></div></div>
-<aside>말에는 사용자의 의도가 담겨 있습니다.<br>진짜 의도는 "답이 마음에 안 드니 제대로 해 달라"는 것인데, 문장의 의미만 보고 답하면 그 의도를 놓치게 됩니다.<br><br>LLM은 말을 벡터로 바꿔서 처리합니다.<br>여러분이 잘 아시듯이, 벡터로 바꾸면 질의와 주제가 비슷한 문장끼리 가까이 놓입니다.<br>그래서 감성적 맥락이 답변에 덜 반영되었을 수 있다고 추측합니다.</aside>
+<aside>우리가 하는 말에는 의도가 담겨 있습니다.<br>화면의 문장을 보시면, 겉으로는 "댓글 반응을 정리해 달라"는 내용이지만, 진짜 하고 싶은 말은 "아까 답이 마음에 안 드니까 제대로 해 달라"는 거죠. 문장의 의미만 보고 답하면 이 의도를 놓치게 됩니다.<br><br>그런데 LLM은 말을 벡터로 바꿔서 처리합니다.<br>여러분도 잘 아시겠지만, 벡터로 바꾸면 주제가 비슷한 문장끼리 가까이 놓이게 됩니다.<br>그래서 저는 감성적 맥락이 답변에 덜 반영된 게 아닐까, 이렇게 추측하고 있습니다.</aside>
 </section>
 <section id="sentiment-gap" data-transition="fade" style="gap:20px;">
 <p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
@@ -491,7 +492,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <p class="src" style="color:#6e7389">단어에서 확인된 문제다. good과 bad는 이웃한 벡터에 놓인다 · 탕 외(Tang et al.) 연구 논문에서 · 2014 [12]</p>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>그림으로 보겠습니다. 우리는 "좋다"와 "나쁘다"를 반대말이라고 생각합니다.<br>하지만 벡터 유사도만 보면 두 말은 가깝게 놓여서, 감성의 차이가 잘 드러나지 않습니다.<br><br>오른쪽 예시도 같습니다. 사용자는 "힐링"을 원합니다.<br>감성으로 보면 "좋다", "편안하다"에 가까운 말입니다.<br>그런데 벡터 유사도만 보면 "자극적이었다", "지루하고 졸렸다"는 리뷰도 가까이 놓입니다.</aside>
+<aside>그림으로 한번 보겠습니다. 우리는 "좋다"와 "나쁘다"를 당연히 반대말이라고 생각하죠.<br>그런데 벡터 유사도만 놓고 보면 이 두 말이 가깝게 놓입니다. 감성의 차이가 잘 드러나지 않는 겁니다.<br><br>오른쪽 예시도 마찬가지입니다. 사용자가 "힐링하고 싶다"고 했습니다.<br>감성으로 보면 "좋다", "편안하다" 쪽에 가까운 말이죠.<br>그런데 벡터 유사도만 보면 "자극적이었다", "지루하고 졸렸다" 같은 리뷰도 같이 가까이 놓입니다.</aside>
 </section>
 <section id="va-lexicon" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
@@ -540,7 +541,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 </div>
 <div class="foot" style="justify-content:normal"><p></p><div class="pg"></div></div>
-<aside>이 문제를 보완하기 위해, 감성 어휘를 수치로 나타내는 연구들이 진행되어 왔습니다. 오른쪽 표는 영어 단어 1만 3천여 개에 사람들이 점수를 매긴 감성사전의 값입니다.<br><br>왼쪽 그림의 가로축은 긍정과 부정, 세로축은 고조와 차분입니다. 이 감성 좌표로 보면 "힐링"은 "편안하다"와 같은 사분면에 있습니다.<br>반면 "자극적이다"는 고조 쪽으로, "지루하다"와 "졸리다"는 부정 쪽으로 떨어져 있습니다.</aside>
+<aside>이 문제를 보완하려고, 감성 어휘를 수치로 나타내는 연구가 계속 이어져 왔습니다. 오른쪽 표는 영어 단어 1만 3천여 개에 사람들이 직접 점수를 매긴 감성사전의 값입니다.<br><br>왼쪽 그림을 보시면, 가로축이 긍정과 부정, 세로축이 고조와 차분입니다. 이 감성 좌표 위에 올려 보면 "힐링"은 "편안하다"와 같은 사분면에 있습니다.<br>반대로 "자극적이다"는 고조 쪽으로, "지루하다"와 "졸리다"는 부정 쪽으로 떨어져 있죠.</aside>
 </section>
 <section id="russell" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
@@ -590,7 +591,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>이 좌표에 앞의 세 리뷰를 올려 보면, 벡터 유사도로는 비슷하던 리뷰들이 서로 다른 자리에 놓이는 것을 볼 수 있습니다. 주황 점선 안, 사용자가 원하던 자리에 들어오는 것은 1번뿐입니다.<br><br>다만 사람이 만든 사전은 새로운 단어와 문맥에 약합니다. 예를 들어 "미쳤다"는 사전에서는 부정적인 말이지만, 리뷰에서는 최고의 칭찬일 수 있습니다.</aside>
+<aside>이번에는 같은 좌표에 아까 그 리뷰 세 개를 올려 봤습니다. 벡터 유사도로는 비슷해 보이던 리뷰들이 서로 다른 자리에 놓이는 걸 보실 수 있습니다. 주황색 점선 안, 그러니까 사용자가 원하던 자리에 들어오는 건 1번 하나뿐입니다.<br><br>다만 한계가 있습니다. 사람이 만든 사전은 새로운 단어나 문맥에 약합니다. 예를 들어 "미쳤다"는 사전에서는 부정적인 말이지만, 리뷰에서는 최고의 칭찬일 수 있죠.</aside>
 </section>
 <section id="why-probing" data-transition="fade" style="gap:16px;">
 <p class="eyebrow">Q2 · 감성적 표현은 왜 덜 반영되고, 어떻게 보완하는가</p>
@@ -616,7 +617,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <p class="note" style="color:#6e7389">꺼내는 방법은 두 가지다. 내부 표현에서 축을 읽거나, LLM에게 두 값을 직접 매기게 한다. 단, 고조·차분 축은 긍정·부정 축보다 약하게 복원된다.</p>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>그러면 최신 LLM은 어떨까요? 최근 연구를 보면, LLM의 내부 표현에서 감성 좌표를 읽어낼 수 있다고 합니다.<br><br>다만 읽어낼 수 있다고 해서 모델이 알아서 써 주는 것은 아닙니다. 그래서 꺼내서 써야 합니다.<br>가장 쉬운 방법은 LLM에게 긍정·부정과 고조·차분, 두 값을 직접 매기게 하는 것입니다.</aside>
+<aside>그러면 최신 LLM은 어떨까요? 최근 연구들을 보면, LLM의 내부 표현에서 이 감성 좌표를 읽어낼 수 있다고 합니다.<br><br>다만 읽어낼 수 있다고 해서 모델이 알아서 써 주는 건 아닙니다. 그래서 우리가 꺼내서 써야 합니다.<br>가장 쉬운 방법은 LLM한테 긍정·부정과 고조·차분, 이 두 값을 직접 매겨 달라고 하는 겁니다.</aside>
 </section>
 <section id="why-arousal" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">Q2의 결론</p>
@@ -658,7 +659,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>두 번째 질문의 결론입니다. 데이터에 담긴 감성은 감성 지표로 따로 다루자는 것입니다.<br><br>감성이 덜 반영되는 이유는, 벡터 유사도에 주제와 문맥이 크게 반영되기 때문입니다.<br>그래서 감성을 긍정·부정과 고조·차분, 두 값으로 꺼내서 벡터 유사도와 함께 보면 놓치던 차이를 구분할 수 있습니다.<br><br>왼쪽 그림에서 주황 점은 챗봇에게 하는 말이고, 남색 점은 리뷰에 쓰는 말입니다. 챗봇에게 하는 욕과 리뷰의 "최악, 환불해"가 같은 자리에 있듯이, 같은 감성은 같은 자리에 놓입니다.<br>그래서 이 방법은 문화 데이터에도 그대로 쓸 수 있습니다. 마지막 질문으로 넘어가겠습니다.</aside>
+<aside>여기까지가 두 번째 질문이었고요, 결론을 정리하겠습니다. 데이터에 담긴 감성은 감성 지표로 따로 다루자는 겁니다.<br><br>감성이 덜 반영되는 건, 벡터 유사도에 주제와 문맥이 크게 반영되기 때문이었습니다.<br>그래서 감성을 긍정·부정과 고조·차분, 두 값으로 꺼내서 벡터 유사도와 함께 보면, 놓치던 차이를 구분할 수 있습니다.<br><br>왼쪽 그림에서 주황색 점은 챗봇에게 하는 말이고, 남색 점은 리뷰에 쓰는 말입니다. 챗봇에게 하는 욕과 리뷰의 "최악, 환불해"가 같은 자리에 있죠. 같은 감성은 같은 자리에 놓입니다.<br>그래서 이 방법은 문화 데이터에도 그대로 쓸 수 있습니다. 이제 마지막 질문으로 넘어가 보겠습니다.</aside>
 </section>
 <section id="culture" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">Q3 · 문화 데이터에는 어떻게 적용할 수 있는가</p>
@@ -712,7 +713,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>문화 데이터에는 어떻게 적용할 수 있을까요?<br>여기서 문화 데이터는 영화, 드라마, 노래, 출판, 캐릭터, 음식, 웹툰, 뷰티에 대한 리뷰와 텍스트를 말합니다.<br><br>오른쪽에 리뷰 네 건이 있습니다. 1번과 2번은 둘 다 별 다섯 개, 3번과 4번은 둘 다 별 하나입니다.<br>별점으로는 같지만, 감성 좌표에 올려 보면 네 리뷰가 모두 다른 자리에 놓입니다.<br>1번은 차분한 만족이고 2번은 들뜬 열광입니다. 3번은 미지근한 실망이고 4번은 화가 난 항의입니다.<br><br>앞에서 벡터 유사도가 감성을 놓쳤듯이, 별점이나 긍정·부정 분석만으로는 고조와 차분의 차이를 놓칠 수 있습니다.</aside>
+<aside>문화 데이터에는 어떻게 적용할 수 있을까요?<br>오늘 말씀드리는 문화 데이터는 영화, 드라마, 노래, 출판, 캐릭터, 음식, 웹툰, 뷰티에 대한 리뷰와 텍스트입니다.<br><br>오른쪽에 리뷰 네 개가 있습니다. 1번과 2번은 둘 다 별 다섯 개, 3번과 4번은 둘 다 별 하나입니다.<br>별점으로는 똑같은데요, 감성 좌표에 올려 보면 네 개가 전부 다른 자리에 놓입니다.<br>1번은 차분한 만족이고, 2번은 들뜬 열광입니다. 3번은 미지근한 실망이고, 4번은 화가 난 항의죠.<br><br>앞에서 벡터 유사도가 감성을 놓쳤던 것처럼, 별점이나 긍정·부정 분석만으로는 고조와 차분의 차이를 놓칠 수 있습니다.</aside>
 </section>
 <section id="cases-arousal" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">Q3 · 근거 1 · 감성 지표를 재면</p>
@@ -733,7 +734,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <div class="grow"></div>
 <div class="callout"><p class="lead">작품의 감성 흐름을 재자, 흥행과 관련된 패턴이 보였다.</p><p class="note" style="color:#6e7389">세 연구 모두 텍스트만으로 분석했고, 주로 긍정·부정 축의 흐름을 쟀다.</p></div>
 <div class="foot"><div class="pg"></div></div>
-<aside>그러면 감성 지표를 실제로 쟀던 연구에서는 무엇이 보였을까요?<br>왼쪽 그림은 작품의 텍스트를 앞에서부터 구간별로 나눠 감성 점수를 매기고, 그 점수를 이은 모양을 여섯 유형으로 나눈 것입니다.<br>소설 1,327편을 분석한 연구에서 이 여섯 유형이 나왔고, 유형에 따라 다운로드 수가 달랐습니다.<br><br>영화 대본 6,174편에서도 같은 여섯 유형이 나왔고, 그중 주황색으로 표시한 추락 후 회복 유형이 장르와 제작비에 관계없이 흥행이 가장 좋았습니다.<br>노래 가사 연구에서는 50년 동안 부정적인 감정어가 늘고 긍정적인 감정어가 줄었습니다.<br><br>다만 이 연구들은 감성만 따로 본 것입니다. 벡터 유사도와 함께 쓰면 어떨까요?</aside>
+<aside>그러면 감성 지표를 실제로 쟀던 연구에서는 뭐가 보였을까요?<br>왼쪽 그림은 작품의 텍스트를 앞에서부터 구간별로 나눠서 감성 점수를 매기고, 그 점수를 이은 모양을 여섯 가지 유형으로 나눈 겁니다.<br>소설 1,327편을 분석한 연구에서 이 여섯 유형이 나왔고요, 유형에 따라 다운로드 수가 달랐습니다.<br><br>영화 대본 6,174편에서도 같은 여섯 유형이 나왔습니다. 그중에서 주황색으로 표시한 추락 후 회복 유형이, 장르나 제작비와 상관없이 흥행이 가장 좋았습니다.<br>노래 가사 연구에서는 50년 동안 부정적인 감정어가 늘고 긍정적인 감정어가 줄었다고 합니다.<br><br>다만 이 연구들은 감성만 따로 본 겁니다. 그러면 벡터 유사도와 함께 쓰면 어떨까요?</aside>
 </section>
 <section id="cases-both" data-transition="fade" style="gap:16px;">
 <p class="eyebrow">Q3 · 근거 2 · 두 지표를 함께 쓰면</p>
@@ -768,7 +769,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <div class="grow"></div>
 <div class="callout" style="padding:14px 32px;"><p class="lead">한쪽만 쓰면 주제나 감성 중 하나를 놓친다. 둘을 함께 쓸 때 결과가 나아졌다.</p></div>
 <div class="foot"><div class="pg"></div></div>
-<aside>두 번째 질문의 결론은 벡터 유사도와 감성 지표를 함께 보자는 것이었습니다. 실제로 함께 쓴 연구들을 보겠습니다.<br><br>위의 세 칸은 앞에서 본 힐링 예시입니다.<br>벡터 유사도만 쓰면 감성이 반대인 리뷰가 섞이고, 감성 지표만 쓰면 주제가 다른 리뷰가 섞입니다. 둘을 함께 써야 원하던 1번만 남습니다.<br><br>아래는 실제 연구입니다. 블로그 검색에서는 주제 관련도와 의견 점수를 합친 순위가 한쪽만 쓴 것보다 좋았습니다.<br>영화 리뷰에서는 임베딩에 감성 값을 더하자 감성 분류와 감정 탐지가 좋아졌습니다.<br>반대로 뉴스 추천에서 감성 유사도만 썼을 때는 클릭률이 낮아졌습니다.<br><br>정리하면, 한쪽만 쓰면 주제나 감성 중 하나를 놓치고, 둘을 함께 쓸 때 결과가 나아졌습니다.</aside>
+<aside>두 번째 질문의 결론이 벡터 유사도와 감성 지표를 함께 보자는 것이었죠. 실제로 함께 쓴 연구들을 보겠습니다.<br><br>위의 세 칸은 아까 본 힐링 예시입니다.<br>벡터 유사도만 쓰면 감성이 반대인 리뷰가 섞이고, 감성 지표만 쓰면 주제가 다른 리뷰가 섞입니다. 둘을 함께 써야 우리가 원하던 1번만 남습니다.<br><br>아래는 실제 연구 결과입니다. 블로그 검색에서는 주제 관련도와 의견 점수를 합친 순위가, 한쪽만 쓴 것보다 좋았습니다.<br>영화 리뷰에서는 임베딩에 감성 값을 더했더니 감성 분류와 감정 탐지가 좋아졌습니다.<br>반대로 뉴스 추천에서 감성 유사도만 썼을 때는 클릭률이 오히려 낮아졌습니다.<br><br>정리하면, 한쪽만 쓰면 주제나 감성 중 하나를 놓치고, 둘을 함께 쓸 때 결과가 나아졌습니다.</aside>
 </section>
 <section id="method" data-transition="fade" style="gap:24px;">
 <p class="eyebrow">Q3 · 적용 방법</p>
@@ -797,7 +798,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <p class="note"><span style="color:#6e7389">남은 과제. LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지는 한국어 문화 콘텐츠에서 아직 검증이 부족하다. 검증 데이터가 먼저 필요하다.</span></p>
 </div>
 <div class="foot"><div class="pg"></div></div>
-<aside>그러면 어떻게 적용할 수 있을까요? 방법은 두 단계입니다.<br><br>먼저 저장할 때, 리뷰마다 임베딩 벡터와 감성 지표를 함께 저장합니다.<br>감성 지표는 LLM에게 긍정·부정과 고조·차분, 두 값을 매기게 해서 메타데이터로 붙일 수 있습니다.<br><br>검색할 때는 "힐링하고 싶다"는 질의가 들어오면, 1단계에서 벡터 유사도로 후보를 찾습니다. 세 리뷰가 모두 올라옵니다.<br>2단계에서 감성 지표로 고릅니다. 긍정이고 차분한 1번만 남습니다.<br>거르는 대신, 앞의 블로그 검색처럼 두 점수를 합쳐 순위를 다시 매길 수도 있습니다.<br><br>다만 과제가 있습니다. LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지, 한국어 문화 콘텐츠에서는 아직 검증이 부족합니다.</aside>
+<aside>그러면 실제로는 어떻게 적용하면 될까요? 방법은 두 단계입니다.<br><br>먼저 저장할 때입니다. 리뷰마다 임베딩 벡터와 감성 지표를 함께 저장합니다.<br>감성 지표는 LLM한테 긍정·부정과 고조·차분, 두 값을 매기게 해서 메타데이터로 붙이면 됩니다.<br><br>다음은 검색할 때입니다. "힐링하고 싶다"는 질의가 들어오면, 1단계에서 벡터 유사도로 후보를 찾습니다. 이때는 세 리뷰가 다 올라옵니다.<br>2단계에서 감성 지표로 고릅니다. 그러면 긍정이고 차분한 1번만 남습니다.<br>꼭 걸러내지 않더라도, 앞의 블로그 검색처럼 두 점수를 합쳐서 순위를 다시 매길 수도 있습니다.<br><br>물론 과제도 있습니다. LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지, 한국어 문화 콘텐츠에서는 아직 검증이 부족합니다.</aside>
 </section>
 <section id="cases-applied" data-transition="fade" style="gap:12px;">
 <p class="eyebrow">Q3 · 분야별 적용</p>
@@ -835,7 +836,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <div class="grow"></div>
 <div class="callout" style="padding:12px 32px; gap:2px;"><p class="lead">분야는 달라도 방법은 같다. 벡터 유사도로 찾고, 감성 지표로 고른다.</p><p class="note">두 상자는 모두 제안이다. 효과는 아직 검증이 필요하고, 그래서 연구 주제가 될 수 있다.</p></div>
 <div class="foot"><div class="pg"></div></div>
-<aside>이 두 단계를 분야별로 적용해 보면 이렇습니다.<br><br>영화와 드라마 추천에서는 "힐링하고 싶다"에 맞는 작품을 찾고, 긍정적이고 차분한 리뷰가 많은 작품을 고릅니다.<br>노래도 같습니다. 가사와 주제가 비슷한 곡을 찾고, 지금 기분과 같은 자리에 있는 곡을 고릅니다.<br>기획에서는 소재가 비슷한 흥행작을 찾아 감성의 흐름을 비교합니다.<br>웹툰에서는 회차별 댓글에서 반응이 식는 회차를 찾고, 뷰티와 음식에서는 부정적이고 고조된 리뷰에 먼저 대응합니다.<br><br>분야는 달라도 방법은 같습니다. 벡터 유사도로 찾고, 감성 지표로 고릅니다.<br>다만 오른쪽 두 칸은 검증된 사례가 아니라 제안입니다. 분야 아래의 작은 글씨가 그 근거가 된 연구입니다.</aside>
+<aside>이 두 단계를 분야별로 적용해 보면 이렇습니다.<br><br>영화나 드라마 추천이라면, "힐링하고 싶다"에 맞는 작품을 찾고, 그중에서 긍정적이고 차분한 리뷰가 많은 작품을 고릅니다.<br>노래도 같습니다. 가사와 주제가 비슷한 곡을 찾고, 지금 기분과 같은 자리에 있는 곡을 고르는 거죠.<br>기획 단계에서는 소재가 비슷한 흥행작을 찾아서 감성의 흐름을 비교해 볼 수 있습니다.<br>웹툰은 회차별 댓글에서 반응이 식는 회차를 찾을 수 있고요, 뷰티나 음식은 부정적이고 고조된 리뷰부터 먼저 대응할 수 있습니다.<br><br>분야는 달라도 방법은 같습니다. 벡터 유사도로 찾고, 감성 지표로 고릅니다.<br>다만 하나 말씀드릴 건, 오른쪽 두 칸은 검증된 사례가 아니라 제안이라는 점입니다. 분야 아래 작은 글씨가 그 근거가 된 연구입니다.</aside>
 </section>
 <section id="closing" class="accent" data-transition="fade" style="gap:24px;">
 <p class="eyebrow" style="color:#2A1A10;">결론 · 세 가지 질문의 답</p>
@@ -846,7 +847,7 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 <div class="row" style="border-top:2px solid #2A1A10; align-items:center; padding-bottom:16px;"><p class="num">Q3</p><div style="flex:1; display:flex; flex-direction:column; gap:2px;"><p class="small">문화 데이터에는 어떻게 적용할 수 있는가</p><p class="lead" style="color:#1B1F3B;">벡터 유사도로 찾고, 감성 지표로 고른다.</p></div></div>
 </div>
 <div class="grow"></div>
-<aside>오늘의 결론입니다. 문화 데이터를 다룰 때도 감성 지표를 고려해야 한다는 것입니다.<br><br>처음의 세 질문에 답해 보겠습니다.<br>챗봇에게 욕을 하면 더 잘 알아들을까? 아닙니다. 정답률에는 사실상 차이가 없었습니다. 오늘 부제의 질문에 대한 답이기도 합니다.<br>감성적 표현은 왜 덜 반영되고, 어떻게 보완할까? 벡터 유사도에는 주제와 문맥이 크게 반영되기 때문이고, 감성 지표를 함께 고려하면 보완할 수 있습니다.<br>문화 데이터에는 어떻게 적용할까? 벡터 유사도로 찾고, 감성 지표로 고릅니다.<br><br>남은 과제는 두 가지입니다. 한국어 문화 콘텐츠 리뷰에 감성 지표를 붙인 검증 데이터가 아직 드물고, LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지도 더 검증해야 합니다.<br>여러분의 연구 주제가 될 수 있다고 생각합니다.<br>들어 주셔서 감사합니다. 질문 받겠습니다.</aside>
+<aside>이제 정리하겠습니다. 오늘의 결론은, 문화 데이터를 다룰 때도 감성 지표를 고려해야 한다는 겁니다.<br><br>처음에 드린 세 질문에 답해 보겠습니다.<br>챗봇에게 욕을 하면 더 잘 알아들을까요? 아닙니다. 정답률에는 사실상 차이가 없었습니다. 오늘 부제에 대한 답이기도 합니다.<br>감성적 표현은 왜 덜 반영되고, 어떻게 보완할까요? 벡터 유사도에는 주제와 문맥이 크게 반영되기 때문이고, 감성 지표를 함께 고려하면 보완할 수 있습니다.<br>문화 데이터에는 어떻게 적용할까요? 벡터 유사도로 찾고, 감성 지표로 고릅니다.<br><br>남은 과제는 두 가지입니다. 한국어 문화 콘텐츠 리뷰에 감성 지표를 붙인 검증 데이터가 아직 드물고요, LLM이 매긴 감성 값이 사람의 평가와 얼마나 맞는지도 더 검증해야 합니다.<br>여기 계신 여러분의 연구 주제가 될 수 있다고 생각합니다.<br><br>들어 주셔서 감사합니다. 질문 받겠습니다.</aside>
 </section>
 <section id="refs" data-transition="fade" style="gap:10px;">
 <p class="eyebrow">참고문헌</p>
@@ -896,24 +897,34 @@ body.list #mhead small{display:block;font:400 13px/1.6 'Noto Sans KR',sans-serif
 </div>
 </div>
 <div class="foot"><p>Claude를 이용하여 조사한 인용이므로 확인 필요함</p><div class="pg"></div></div>
-<aside>참고문헌입니다. 발표 자료에 표시한 번호와 같은 번호로 정리했습니다.</aside>
+<aside>참고문헌입니다. 발표 자료에 표시한 번호 그대로 정리해 두었습니다.</aside>
 </section>
+<div id="cap" aria-live="polite" hidden><p id="cap-text"></p><span id="cap-n"></span></div>
 </div></div>
-<div id="notes" aria-live="polite"><h4>발표 대본</h4><div id="notes-text"></div></div>
 <div id="bar">
 <button id="prev" aria-label="이전 슬라이드">‹ 이전</button>
 <span id="count">1 / 20</span>
 <button id="next" aria-label="다음 슬라이드">다음 ›</button>
 <span class="sp"></span>
-<span class="wide hint">← → 키로 넘기기 · N 대본</span>
-<button id="toggle" aria-pressed="false">대본 보기</button>
+<span class="wide hint">← → 키로 넘기기 · N 자막</span>
+<button id="toggle" aria-pressed="false">자막 보기</button>
 <button id="full" class="wide">전체 화면</button>
-<a href="script.txt" class="wide">대본 txt</a>
 <a href="../#talks" class="wide">작업실</a>
 </div>
 <script>
 (function(){
-var S=[].slice.call(document.querySelectorAll('#stage > section')),n=S.length,i=0,list=false;
+var S=[].slice.call(document.querySelectorAll('#stage > section')),n=S.length,i=0,list=false,capOn=false,ci=0;
+var cap=document.getElementById('cap'),capText=document.getElementById('cap-text'),capN=document.getElementById('cap-n');
+// 대본을 자막 조각으로: 줄바꿈과 문장 끝에서 나누고, 긴 문장은 쉼표에서 한 번 더 나눠요
+function pieces(a){var out=[];if(!a)return out;var d=document.createElement('div');
+a.innerHTML.split(/<br\s*\/?>/i).forEach(function(line){d.innerHTML=line;var s=d.textContent.trim();if(!s)return;
+(s.match(/[^.?!…]+[.?!…]+["”’)]*|[^.?!…]+$/g)||[s]).forEach(function(q){q=q.trim();if(!q)return;
+if(/^[.?!…"”’)]+$/.test(q)&&out.length){out[out.length-1]+=q;return;}
+if(q.length>58){var m=Math.floor(q.length/2),best=-1;for(var k=0;k<q.length;k++){if(q[k]===','&&(best<0||Math.abs(k-m)<Math.abs(best-m)))best=k;}
+if(best>12&&best<q.length-12){out.push(q.slice(0,best+1).trim());out.push(q.slice(best+1).trim());return;}}
+out.push(q);});});return out;}
+var P=S.map(function(s){return pieces(s.querySelector('aside'));});
+function showCap(){var L=P[i];if(!capOn||list||!L.length){cap.hidden=true;return;}ci=Math.max(0,Math.min(L.length-1,ci));cap.hidden=false;capText.textContent=L[ci];capN.textContent=(ci+1)+'/'+L.length;}
 S.forEach(function(s,j){var w=document.createElement('div');w.className='slot';s.parentNode.insertBefore(w,s);w.appendChild(s);
 var a=s.querySelector('aside');if(a){var d=document.createElement('details');d.className='mnote';d.innerHTML='<summary>'+(j+1)+'장 대본</summary><div>'+a.innerHTML+'</div>';w.parentNode.insertBefore(d,w.nextSibling);}});
 var stage=document.getElementById('stage'),vp=document.getElementById('viewport');
@@ -924,24 +935,25 @@ S.forEach(function(x){x.style.transform='';x.parentNode.style.height='';});
 var r=vp.getBoundingClientRect();stage.style.transform='scale('+Math.min(r.width/1920,r.height/1080)+')';}
 function go(k,push){i=Math.max(0,Math.min(n-1,k));S.forEach(function(s,j){s.classList.toggle('on',j===i);s.setAttribute('aria-hidden',j===i?'false':'true');});
 document.getElementById('count').textContent=(i+1)+' / '+n;
-var a=S[i].querySelector('aside');document.getElementById('notes-text').innerHTML=a?a.innerHTML:'';
+showCap();
 if(push!==false)history.replaceState(null,'','#'+(i+1));}
-function toggle(){var on=document.body.classList.toggle('notes');document.getElementById('toggle').setAttribute('aria-pressed',on);document.getElementById('toggle').textContent=on?'대본 닫기':'대본 보기';fit();}
-document.getElementById('prev').onclick=function(){go(i-1);};
-document.getElementById('next').onclick=function(){go(i+1);};
+function toggle(){capOn=!capOn;ci=0;document.getElementById('toggle').setAttribute('aria-pressed',capOn);document.getElementById('toggle').textContent=capOn?'자막 끄기':'자막 보기';showCap();}
+function step(d){if(capOn&&!list){var L=P[i];if(d>0&&ci<L.length-1){ci++;showCap();return;}if(d<0&&ci>0){ci--;showCap();return;}if(d>0&&i<n-1){ci=0;go(i+1);return;}if(d<0&&i>0){ci=P[i-1].length-1;go(i-1);return;}return;}go(i+d);}
+document.getElementById('prev').onclick=function(){step(-1);};
+document.getElementById('next').onclick=function(){step(1);};
 document.getElementById('toggle').onclick=toggle;
 document.getElementById('full').onclick=function(){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();};
 document.addEventListener('keydown',function(e){if(list)return;if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter'))return;
-if(['ArrowRight','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();go(i+1);}
-else if(['ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();go(i-1);}
-else if(e.key==='Home')go(0);else if(e.key==='End')go(n-1);
+if(['ArrowRight','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();step(1);}
+else if(['ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();step(-1);}
+else if(e.key==='Home'){ci=0;go(0);}else if(e.key==='End'){ci=0;go(n-1);}
 else if(e.key==='n'||e.key==='N'||e.key==='ㅜ')toggle();
 else if(e.key==='f'||e.key==='F')document.getElementById('full').click();});
-vp.addEventListener('click',function(e){if(list)return;var r=vp.getBoundingClientRect();go(e.clientX<r.left+r.width/3?i-1:i+1);});
+vp.addEventListener('click',function(e){if(list)return;var r=vp.getBoundingClientRect();step(e.clientX<r.left+r.width/3?-1:1);});
 var x0=null;vp.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
-vp.addEventListener('touchend',function(e){if(list||x0===null)return;var d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)go(d<0?i+1:i-1);x0=null;});
+vp.addEventListener('touchend',function(e){if(list||x0===null)return;var d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)step(d<0?1:-1);x0=null;});
 window.addEventListener('resize',fit);
-window.addEventListener('hashchange',function(){var k=parseInt(location.hash.slice(1),10);if(!isNaN(k)&&k-1!==i)go(k-1,false);});
+window.addEventListener('hashchange',function(){var k=parseInt(location.hash.slice(1),10);if(!isNaN(k)&&k-1!==i){ci=0;go(k-1,false);}});
 var h=parseInt(location.hash.slice(1),10);go(isNaN(h)?0:h-1,false);fit();
 if(list&&!isNaN(h)&&S[h-1])S[h-1].parentNode.scrollIntoView();
 })();
