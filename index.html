@@ -81,6 +81,10 @@
   .steps li + li { padding-left: 18px; border-left: 1px solid var(--grid); }
   .steps b { display: block; color: var(--ink); font: 600 17px/1.4 var(--display); }
   .steps b::before { content: counter(s) ". "; color: var(--leaf); }
+  /* 차례가 아닌 세 가지(프로젝트의 볼 것): 번호를 붙이지 않는다 */
+  .steps.pts b::before { content: none; }
+  .entry ul.steps { padding-left: 0; font-size: inherit; }
+  .entry ul.steps li { margin: 0; }
   .soon { margin: 44px 0 0; padding-top: 20px; border-top: 1px dashed var(--ink); color: var(--muted); font-size: 15.5px; }
 
   footer { margin-top: 96px; border-top: 2px solid var(--ink); }
@@ -191,16 +195,22 @@
         <p class="kind"><span>웹 게임</span><span>v0.8.0, 플레이 가능</span><span class="made">claude-haejo로 만듦</span></p>
         <h3>LinkPRG</h3>
         <p class="one">누른 만큼 강해지는 글 RPG예요.</p>
-        <p class="desc">대화방처럼 흐르는 글로 하는 혼자용 RPG예요. 반복 버튼이 없어서 백 번은 손으로 백 번 눌러야 하고, 고생한 만큼 숙련도와 장비, 사람들과의 사이가 쌓여요. 레벨 100까지 지역 열 곳과 열세 장의 이야기가 이어지고, 어떻게 풀어 왔는지가 마지막에 고를 수 있는 끝을 정해요.</p>
+        <p class="desc">대화방처럼 흐르는 글을 읽고, 아래 다섯 칸에서 할 일을 골라 누르는 혼자용 RPG예요. 허수아비를 치고, 쇠를 두드리고, 사람들과 가까워지면서 조금씩 먼 곳으로 나아가요.</p>
         <ul>
           <li>설치·회원가입 없이 휴대폰·PC 브라우저에서 바로</li>
           <li>무료, 광고·결제 없음</li>
+          <li>구글 드라이브에 저장해 다른 기기에서 이어 하기</li>
         </ul>
         <div class="go">
           <a class="btn" href="https://ff-1204.github.io/LinkPRG/">게임 시작하기</a>
           <a class="link star" href="https://github.com/ff-1204/LinkPRG" data-repo="ff-1204/LinkPRG" title="GitHub에서 스타 주기"><span class="st" aria-hidden="true">★</span> GitHub 스타 <b class="stars" hidden></b></a>
         </div>
       </div>
+      <ul class="steps pts">
+        <li><b>한 번 누르면 한 번</b>반복 버튼이 없어요. 백 번은 손으로 백 번 누르고, 끝까지 한 사람에게 세계가 답해요.</li>
+        <li><b>레벨 100, 지역 열 곳</b>눈밭의 체온, 물 아래의 숨처럼 지역마다 그곳에서만 통하는 규칙이 하나씩 있어요.</li>
+        <li><b>끝은 내가 고른다</b>열세 장의 이야기를 어떻게 풀어 왔는지가 마지막에 고를 수 있는 끝을 정해요.</li>
+      </ul>
     </article>
 
     <!-- 다음 자리: 프로젝트가 생기면 이 줄 바로 위에 새 article을 넣어요 -->
